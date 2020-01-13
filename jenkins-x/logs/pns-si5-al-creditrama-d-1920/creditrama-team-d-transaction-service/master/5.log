@@ -1,0 +1,190 @@
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-credential-initializer-wqzt5[0m
+{"level":"warn","ts":1578922985.896371,"logger":"fallback-logger","caller":"logging/config.go:69","msg":"Fetch GitHub commit ID from kodata failed: \"ref: refs/heads/0.8.0-**-support-backwards-incompats\" is not a valid GitHub commit ID"}
+{"level":"info","ts":1578922985.897093,"logger":"fallback-logger","caller":"creds-init/main.go:40","msg":"Credentials initialized."}
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-working-dir-initializer-x2jtl[0m
+{"level":"warn","ts":1578922991.4190063,"logger":"fallback-logger","caller":"logging/config.go:69","msg":"Fetch GitHub commit ID from kodata failed: open /var/run/ko/HEAD: no such file or directory"}
+{"level":"info","ts":1578922991.420701,"logger":"fallback-logger","caller":"bash/main.go:64","msg":"Successfully executed command \"sh -c mkdir -p /workspace/source\"; output "}
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-place-tools[0m
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-git-source-pns-si5-al-creditrama-d-1920-cr-wsnmx[0m
+{"level":"warn","ts":1578923024.977887,"logger":"fallback-logger","caller":"logging/config.go:69","msg":"Fetch GitHub commit ID from kodata failed: \"ref: refs/heads/0.8.0-**-support-backwards-incompats\" is not a valid GitHub commit ID"}
+{"level":"info","ts":1578923026.2675655,"logger":"fallback-logger","caller":"git/git.go:103","msg":"Successfully cloned https://github.com/pns-si5-al-creditrama-d-1920/creditrama-team-d-transaction-service.git @ v0.0.3 in path /workspace/source"}
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-git-merge[0m
+Using SHAs from PULL_REFS=master:045634d7a0f98d4e43688c30b84de2f004c61a26
+WARNING: no SHAs to merge, falling back to initial cloned commit
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-setup-jx-git-credentials[0m
+Generated Git credentials file /workspace/xdg_config/git/credentials
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-build-mvn-deploy[0m
+Picked up _JAVA_OPTIONS: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
+OpenJDK 64-Bit Server VM warning: If the number of processors is expected to increase from one, then you should configure the number of parallel GC threads appropriately using -XX:ParallelGCThreads=N
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --< fr.unice.polytech.si5.al.creditrama.teamd:creditrama-team-d-transaction-service >--
+[INFO] Building transaction-service 0.0.3
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:3.1.0:clean (default-clean) @ creditrama-team-d-transaction-service ---
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:resources (default-resources) @ creditrama-team-d-transaction-service ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:compile (default-compile) @ creditrama-team-d-transaction-service ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /workspace/source/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:3.1.0:testResources (default-testResources) @ creditrama-team-d-transaction-service ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /workspace/source/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.8.1:testCompile (default-testCompile) @ creditrama-team-d-transaction-service ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /workspace/source/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:3.0.0-M1:test (default-test) @ creditrama-team-d-transaction-service ---
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests
+13:44:05.585 [main] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating CacheAwareContextLoaderDelegate from class [org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate]
+13:44:05.600 [main] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating BootstrapContext using constructor [public org.springframework.test.context.support.DefaultBootstrapContext(java.lang.Class,org.springframework.test.context.CacheAwareContextLoaderDelegate)]
+13:44:05.692 [main] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating TestContextBootstrapper for test class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests] from class [org.springframework.boot.test.context.SpringBootTestContextBootstrapper]
+13:44:05.709 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Neither @ContextConfiguration nor @ContextHierarchy found for test class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests], using SpringBootContextLoader
+13:44:05.712 [main] DEBUG org.springframework.test.context.support.AbstractContextLoader - Did not detect default resource location for test class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests]: class path resource [fr/unice/polytech/si5/al/creditrama/teamd/creditramateamdtransactionservice/DemoApplicationTests-context.xml] does not exist
+13:44:05.713 [main] DEBUG org.springframework.test.context.support.AbstractContextLoader - Did not detect default resource location for test class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests]: class path resource [fr/unice/polytech/si5/al/creditrama/teamd/creditramateamdtransactionservice/DemoApplicationTestsContext.groovy] does not exist
+13:44:05.713 [main] INFO org.springframework.test.context.support.AbstractContextLoader - Could not detect default resource locations for test class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests]: no resource found for suffixes {-context.xml, Context.groovy}.
+13:44:05.713 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests]: DemoApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+13:44:05.807 [main] DEBUG org.springframework.test.context.support.ActiveProfilesUtils - Could not find an 'annotation declaring class' for annotation type [org.springframework.test.context.ActiveProfiles] and class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests]
+13:44:05.990 [main] DEBUG org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider - Identified candidate component class: file [/workspace/source/target/classes/fr/unice/polytech/si5/al/creditrama/teamd/creditramateamdtransactionservice/DemoApplication.class]
+13:44:05.992 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplication for test class fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests
+13:44:06.161 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - @TestExecutionListeners is not present for class [fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests]: using defaults.
+13:44:06.162 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener, org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener, org.springframework.test.context.event.EventPublishingTestExecutionListener]
+13:44:06.184 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Skipping candidate TestExecutionListener [org.springframework.test.context.transaction.TransactionalTestExecutionListener] due to a missing dependency. Specify custom listener classes or make the default listener classes and their required dependencies available. Offending class: [org/springframework/transaction/interceptor/TransactionAttributeSource]
+13:44:06.185 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Skipping candidate TestExecutionListener [org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener] due to a missing dependency. Specify custom listener classes or make the default listener classes and their required dependencies available. Offending class: [org/springframework/transaction/interceptor/TransactionAttribute]
+13:44:06.185 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@4efc180e, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@bd4dc25, org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener@25084a1e, org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener@156b88f5, org.springframework.test.context.support.DirtiesContextTestExecutionListener@3bf9ce3e, org.springframework.test.context.event.EventPublishingTestExecutionListener@16610890, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener@71def8f8, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener@383bfa16, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener@4d465b11, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener@53fdffa1, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener@5562c41e]
+13:44:06.188 [main] DEBUG org.springframework.test.context.support.AbstractDirtiesContextTestExecutionListener - Before test class: context [DefaultTestContext@7205765b testClass = DemoApplicationTests, testInstance = [null], testMethod = [null], testException = [null], mergedContextConfiguration = [WebMergedContextConfiguration@47987356 testClass = DemoApplicationTests, locations = '{}', classes = '{class fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplication}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true}', contextCustomizers = set[org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@78aab498, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@51e5fc98, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@48aaecc3, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizerFactory$Customizer@78b66d36], resourceBasePath = 'src/main/webapp', contextLoader = 'org.springframework.boot.test.context.SpringBootContextLoader', parent = [null]], attributes = map['org.springframework.test.context.web.ServletTestExecutionListener.activateListener' -> true]], class annotated with @DirtiesContext [false] with mode [null].
+13:44:06.293 [main] DEBUG org.springframework.test.context.support.TestPropertySourceUtils - Adding inlined properties to environment: {spring.jmx.enabled=false, org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true, server.port=-1}
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.2.2.RELEASE)
+
+2020-01-13 13:44:06.887  INFO 70 --- [           main] f.u.p.s.a.c.t.c.DemoApplicationTests     : Starting DemoApplicationTests on pns-si5-al-creditrama-d-1920-cr-p9rbg-5-from-build-pack-lmb9h-p with PID 70 (started by root in /workspace/source)
+2020-01-13 13:44:06.888  INFO 70 --- [           main] f.u.p.s.a.c.t.c.DemoApplicationTests     : No active profile set, falling back to default profiles: default
+2020-01-13 13:44:11.601  INFO 70 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2020-01-13 13:44:13.187  INFO 70 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2020-01-13 13:44:13.314  INFO 70 --- [           main] f.u.p.s.a.c.t.c.DemoApplicationTests     : Started DemoApplicationTests in 7.012 seconds (JVM running for 8.914)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.391 s - in fr.unice.polytech.si5.al.creditrama.teamd.creditramateamdtransactionservice.DemoApplicationTests
+2020-01-13 13:44:13.888  INFO 70 --- [extShutdownHook] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-jar-plugin:3.1.2:jar (default-jar) @ creditrama-team-d-transaction-service ---
+[INFO] Building jar: /workspace/source/target/creditrama-team-d-transaction-service-0.0.3.jar
+[INFO] 
+[INFO] --- spring-boot-maven-plugin:2.2.2.RELEASE:repackage (repackage) @ creditrama-team-d-transaction-service ---
+[INFO] Replacing main artifact with repackaged archive
+[INFO] 
+[INFO] --- maven-install-plugin:2.5.2:install (default-install) @ creditrama-team-d-transaction-service ---
+[INFO] Installing /workspace/source/target/creditrama-team-d-transaction-service-0.0.3.jar to /root/.mvnrepository/fr/unice/polytech/si5/al/creditrama/teamd/creditrama-team-d-transaction-service/0.0.3/creditrama-team-d-transaction-service-0.0.3.jar
+[INFO] Installing /workspace/source/pom.xml to /root/.mvnrepository/fr/unice/polytech/si5/al/creditrama/teamd/creditrama-team-d-transaction-service/0.0.3/creditrama-team-d-transaction-service-0.0.3.pom
+[INFO] 
+[INFO] --- maven-deploy-plugin:2.8.2:deploy (default-deploy) @ creditrama-team-d-transaction-service ---
+[INFO] Using alternate deployment repository nexus::default::http://nexus/repository/maven-releases/
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:18 min
+[INFO] Finished at: 2020-01-13T13:45:09Z
+[INFO] ------------------------------------------------------------------------
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-build-skaffold-version[0m
+v1.0.1
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-build-container-build[0m
+[36mINFO[0m[0000] Downloading base image openjdk:8-jdk-slim    
+2020/01/13 13:45:12 No matching credentials were found, falling back on anonymous
+[36mINFO[0m[0001] Error while retrieving image from cache: getting file info: stat /workspace/sha256:1ca54f9636c527ec05550bf9bdcbc10a86ab6c28381db73ac3411466055dd300: no such file or directory 
+[36mINFO[0m[0001] Downloading base image openjdk:8-jdk-slim    
+2020/01/13 13:45:14 No matching credentials were found, falling back on anonymous
+[36mINFO[0m[0002] cmd: EXPOSE                                  
+[36mINFO[0m[0002] Adding exposed port: 8080/tcp                
+[36mINFO[0m[0002] Using files from context: [/workspace/source/pom.xml] 
+[36mINFO[0m[0002] Using files from context: [/workspace/source/target/creditrama-team-d-transaction-service-0.0.3.jar] 
+[36mINFO[0m[0002] Skipping unpacking as no commands require it. 
+[36mINFO[0m[0002] Taking snapshot of full filesystem...        
+[36mINFO[0m[0059] ENV PORT 8080                                
+[36mINFO[0m[0059] No files changed in this command, skipping snapshotting. 
+[36mINFO[0m[0059] ENV CLASSPATH /opt/lib                       
+[36mINFO[0m[0059] No files changed in this command, skipping snapshotting. 
+[36mINFO[0m[0059] EXPOSE 8080                                  
+[36mINFO[0m[0059] cmd: EXPOSE                                  
+[36mINFO[0m[0059] Adding exposed port: 8080/tcp                
+[36mINFO[0m[0059] No files changed in this command, skipping snapshotting. 
+[36mINFO[0m[0059] Using files from context: [/workspace/source/pom.xml] 
+[36mINFO[0m[0059] COPY pom.xml target/lib* /opt/lib/           
+[36mINFO[0m[0059] Taking snapshot of files...                  
+[36mINFO[0m[0059] Using files from context: [/workspace/source/target/creditrama-team-d-transaction-service-0.0.3.jar] 
+[36mINFO[0m[0059] COPY target/*.jar /opt/app.jar               
+[36mINFO[0m[0059] Taking snapshot of files...                  
+[36mINFO[0m[0059] WORKDIR /opt                                 
+[36mINFO[0m[0059] cmd: workdir                                 
+[36mINFO[0m[0059] Changed working directory to /opt            
+[36mINFO[0m[0059] No files changed in this command, skipping snapshotting. 
+[36mINFO[0m[0059] CMD ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-jar", "app.jar"] 
+[36mINFO[0m[0059] No files changed in this command, skipping snapshotting. 
+2020/01/13 13:46:15 pushed blob: sha256:e690fb8051a73008fea02f33e91ac52f12c251c37be46db46d5cd8d563116a43
+2020/01/13 13:46:15 pushed blob: sha256:004796fc157483a9325ff18d32a1c68087fcb7996a7d2bd5bac1a568033ea792
+2020/01/13 13:46:15 pushed blob: sha256:e18af1784b1ff42bce5eb771c6fb00c06471e462db471e4821b42a75f99d1bee
+2020/01/13 13:46:15 pushed blob: sha256:7700301e5801c4551a456f9f26e1954c61db9ec6899050276326cdeef98130f0
+2020/01/13 13:46:16 pushed blob: sha256:8e866b0959566a21a8fa7eb2f7f12da0d12aa3498d6c31bb25a6ede1fa632ac2
+2020/01/13 13:46:16 pushed blob: sha256:8ec398bc03560e0fa56440e96da307cdf0b1ad153f459b52bca53ae7ddb8236d
+2020/01/13 13:46:18 pushed blob: sha256:2af781a14d60d4ac7ef41ca3bed9787d5bc332e74f0b64183528b9ae196b6aa4
+2020/01/13 13:46:20 docker-registry.default.svc:5000/pns-si5-al-creditrama-d-1920/creditrama-team-d-transaction-service:0.0.3: digest: sha256:a139cb9909752dfb345adcc95b3fd18dd4bdb597c54b92f5e45784afbd992418 size: 1244
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-build-post-build[0m
+no CVE provider running in the current ** namespace so skip adding image to be analysed
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-promote-changelog[0m
+Converted /workspace/source/charts/creditrama-team-d-transaction-service to an unshallow repository
+Generating change log from git ref 3d4890fbdcd4c0d98c4fe3b039b6b81661a53975 => 135617ac94504aa7f92177e81b2ff2883f2ac834
+WARNING: Failed to enrich commit 045634d7a0f98d4e43688c30b84de2f004c61a26 with issues: users.jenkins.io "x-0" already exists
+WARNING: Failed to enrich commit 045634d7a0f98d4e43688c30b84de2f004c61a26 with issues: users.jenkins.io "x-0" already exists
+Finding issues in commit messages using git format
+WARNING: Failed to enrich commit 220b36493fc85b131ada3b61912fb716e1bd8673 with issues: users.jenkins.io "x-0" already exists
+WARNING: Failed to enrich commit 220b36493fc85b131ada3b61912fb716e1bd8673 with issues: users.jenkins.io "x-0" already exists
+WARNING: No release found for pns-si5-al-creditrama-d-1920/creditrama-team-d-transaction-service and tag v0.0.3 so creating a new release
+Updated the release information at https://github.com/pns-si5-al-creditrama-d-1920/creditrama-team-d-transaction-service/releases/tag/v0.0.3
+generated: /workspace/source/charts/creditrama-team-d-transaction-service/templates/release.yaml
+Created Release creditrama-team-d-transaction-service-0-0-3 resource in namespace **
+Updating PipelineActivity pns-si5-al-creditrama-d-1920-creditrama-team-d-transaction-service-master-5 with version 0.0.3
+Updated PipelineActivities pns-si5-al-creditrama-d-1920-creditrama-team-d-transaction-service-master-5 with release notes URL: https://github.com/pns-si5-al-creditrama-d-1920/creditrama-team-d-transaction-service/releases/tag/v0.0.3
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-promote-helm-release[0m
+WARNING: No $CHART_REPOSITORY defined so using the default value of: http://jenkins-x-chartmuseum:8080
+Adding missing Helm repo: storage.googleapis.com https://storage.googleapis.com/chartmuseum.jenkins-x.io
+Successfully added Helm repository storage.googleapis.com.
+Adding missing Helm repo: jenkins-x-chartmuseum http://jenkins-x-chartmuseum:8080
+Successfully added Helm repository jenkins-x-chartmuseum.
+WARNING: No $CHART_REPOSITORY defined so using the default value of: http://jenkins-x-chartmuseum:8080
+Uploading chart file creditrama-team-d-transaction-service-0.0.3.tgz to http://jenkins-x-chartmuseum:8080/api/charts
+Received 201 response: {"saved":true}
+
+Showing logs for build [32mpns-si5-al-creditrama-d-1920-cr-p9rbg-5[0m stage [32mfrom-build-pack[0m and container [32mstep-promote-jx-promote[0m
+WARNING: prow based install so skip waiting for the merge of Pull Requests to go green as currently there is an issue with gettingstatuses from the PR, see https://github.com/jenkins-x/**/issues/2410
+WARNING: No $CHART_REPOSITORY defined so using the default value of: http://jenkins-x-chartmuseum:8080
