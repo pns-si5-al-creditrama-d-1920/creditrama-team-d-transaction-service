@@ -11,8 +11,8 @@
 	<groupId>fr.unice.polytech.si5.al.creditrama.teamd</groupId>
 	<artifactId>creditrama-team-d-transaction-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project for Spring Boot</description>
+	<name>transaction-service</name>
+	<description>Transaction Service</description>
 
 	<properties>
 		<java.version>1.8</java.version>
