@@ -4,15 +4,6 @@ pipelineConfig:
     overrides:
       - pipeline: release
         stage: promote
-        name: make-promote
-        steps:
-          - dir: charts/$APP_NAME
-            steps:
-            - sh: jx step changelog --version v\$(cat ../../VERSION)
-              name: changelog
-            - comment: release the helm chart
-              sh: jx step helm release
-              name: helm-release
-            - comment: promote through all 'Auto' promotion Environments
-              sh: jx promote -b -e github-alexis --timeout 1h --version \$(cat ../../VERSION)
-              name: jx-promote
+        name: jx-promote
+        step:
+          sh: jx promote -b -e github-alexis --timeout 1h --version \$(cat ../../VERSION)
