@@ -11,7 +11,7 @@
     <groupId>fr.unice.polytech.si5.al.creditrama.teamd</groupId>
     <artifactId>transactionservice</artifactId>
     <version>0.0.2-SNAPSHOT</version>
-    <name>bankAccount-service</name>
+    <name>transaction-service</name>
     <description>TransactionService</description>
 
     <properties>
