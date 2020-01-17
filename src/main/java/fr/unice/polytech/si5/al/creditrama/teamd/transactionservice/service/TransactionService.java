@@ -6,9 +6,9 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transa
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -17,10 +17,13 @@ import java.util.UUID;
 public class TransactionService {
     private TransactionRepository transactionRepository;
     private BankAccountClient bankAccountClient;
+    private NotificationService notificationService;
 
-    public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient) {
+    @Autowired
+    public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient, NotificationService notificationService) {
         this.transactionRepository = transactionRepository;
         this.bankAccountClient = bankAccountClient;
+        this.notificationService = notificationService;
     }
 
     public void makeTransaction(final TransactionRequest transactionRequest) {
@@ -51,6 +54,7 @@ public class TransactionService {
         }
         transaction.setTransactionState(TransactionState.ACCEPTED);
         transactionRepository.save(transaction);
+        notificationService.sendMail(transaction);
     }
 
     public List<Transaction> getAcceptedTransactionByIban(String iban) {
@@ -58,6 +62,7 @@ public class TransactionService {
         allByIban.addAll(transactionRepository.findAllBySourceIbanAndTransactionState(iban, TransactionState.ACCEPTED));
         return allByIban;
     }
+
     public List<Transaction> getAcceptedTransactionByIban(long id) {
         List<Transaction> allById = transactionRepository.findAllByDestClientAndTransactionState(id, TransactionState.ACCEPTED);
         allById.addAll(transactionRepository.findAllBySourceClientAndTransactionState(id, TransactionState.ACCEPTED));

@@ -31,7 +31,7 @@ class FeignConfiguration {
         details.setAccessTokenUri(accessTokenUri);
         details.setClientId(clientId);
         details.setClientSecret(clientSecret);
-       // details.setScope(scope);
+        // details.setScope(scope);
         details.setUsername("admin");
         details.setPassword("TT829Alexis");
         return details;

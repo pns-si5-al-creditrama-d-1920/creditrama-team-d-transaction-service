@@ -28,6 +28,7 @@ public class TransactionController {
     public ResponseEntity<List<Transaction>> getTransactionByIban(@PathVariable(value = "iban") String iban) {
         return ResponseEntity.ok(transactionService.getAcceptedTransactionByIban(iban));
     }
+
     @GetMapping("clients/{id}/transactions")
     public ResponseEntity<List<Transaction>> getTransactionByIban(@PathVariable(value = "id") long id) {
         return ResponseEntity.ok(transactionService.getAcceptedTransactionByIban(id));

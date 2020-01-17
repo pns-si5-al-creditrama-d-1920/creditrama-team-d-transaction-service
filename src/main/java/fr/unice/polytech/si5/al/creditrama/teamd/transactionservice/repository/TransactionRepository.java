@@ -8,7 +8,10 @@ import java.util.List;
 
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
     List<Transaction> findAllByDestIbanAndTransactionState(String iban, TransactionState transactionState);
+
     List<Transaction> findAllBySourceIbanAndTransactionState(String iban, TransactionState transactionState);
+
     List<Transaction> findAllBySourceClientAndTransactionState(long id, TransactionState transactionState);
+
     List<Transaction> findAllByDestClientAndTransactionState(long id, TransactionState transactionState);
 }
