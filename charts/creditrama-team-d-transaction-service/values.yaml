@@ -9,7 +9,15 @@ image:
 
 # define environment variables here as a map of key: value
 env:
-
+  PORT: "8080"
+  KAFKA_BROKER: "kafka-kafka-brokers.kafka.svc"
+  AUTHORIZATION_HOST: "creditrama-team-d-authorization-service.al-team-d.svc"
+  AUTHORIZATION_PORT: "8080"
+  SERVICE_BANKACCOUNT: "creditrama-team-d-bankaccount-service.al-team-d.svc"
+  MONGO_HOST: "mongo-n27-mongodb.florianjuroszek.svc"
+  MONGO_PORT: 27017
+  MONGO_PWD: "jboss-team-d"
+  MONGO_USER: "teamd"
 # enable this flag to use knative serve to deploy the app
 knativeDeploy: false
 
