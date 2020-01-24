@@ -6,7 +6,6 @@ image:
   repository: draft
   tag: dev
   pullPolicy: IfNotPresent
-
 # define environment variables here as a map of key: value
 env:
   PORT: "8080"
@@ -19,6 +18,7 @@ env:
   AUTHORIZATION_PORT: "8080"
   BANKACCOUNT_HOST: "http://creditrama-team-d-bankaccount-service-al-team-d.apps.jboss.team"
   BANKACCOUNT_PORT: "8080"
+
 # enable this flag to use knative serve to deploy the app
 knativeDeploy: false
 
