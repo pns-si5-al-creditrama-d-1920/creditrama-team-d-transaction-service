@@ -3,11 +3,13 @@ server:
 spring:
   data:
     mongodb:
-      database: ${MONGO_DB:transactions_db}
+      database: transactions_db
       port: ${MONGO_PORT:27017}
       host: ${MONGO_HOST:localhost}
+      username: ${MONGO_USER:team-d}
+      password: ${MONGO_PWD:jboss-team-d}
   application:
-    name: profile
+    name: transaction
   cloud:
     stream:
       kafka:
@@ -17,9 +19,9 @@ spring:
 security:
   oauth2:
     resource:
-      access-token-uri: http://${AUTHORIZATION_HOST:localhost}:9191/oauth/token
-      token-info-uri: http://${AUTHORIZATION_HOST:localhost}:9191/oauth/check_token
+      access-token-uri: ${AUTHORIZATION_HOST:http://localhost:9191}/oauth/token
+      token-info-uri: ${AUTHORIZATION_HOST:http://localhost:9191}/oauth/check_token
     client:
       client-id: mobile
       client-secret: pin
-service.bankaccount: http://${BANKACCOUNT_HOST:localhost}:8083/
+service.bankaccount: ${BANKACCOUNT_HOST:http://localhost:8083/}
