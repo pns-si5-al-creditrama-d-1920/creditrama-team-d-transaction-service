@@ -47,6 +47,7 @@ public class TransactionService {
 
             }
         } catch (Exception e) {
+            e.printStackTrace();
             //By Default if we catch an exception we make the transaction in cancel state
             transaction.setTransactionState(TransactionState.CANCEL);
             transactionRepository.save(transaction);

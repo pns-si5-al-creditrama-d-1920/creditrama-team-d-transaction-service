@@ -22,4 +22,4 @@ security:
     client:
       client-id: mobile
       client-secret: pin
-service.bankaccount: ${BANKACCOUNT_HOST:http://localhost:8083/}
+service.bankaccount: http://${BANKACCOUNT_HOST:localhost}:8083/
