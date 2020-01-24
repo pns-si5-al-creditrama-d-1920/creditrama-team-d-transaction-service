@@ -4,6 +4,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transa
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,8 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions")
-    public void createTransaction(@RequestBody TransactionRequest transaction) {
-        transactionService.makeTransaction(transaction);
+    public ResponseEntity<HttpStatus> createTransaction(@RequestBody TransactionRequest transaction) {
+        return transactionService.makeTransaction(transaction);
     }
 
     @GetMapping("/transactions/{iban}")
