@@ -34,5 +34,4 @@ public class TransactionController {
     public ResponseEntity<List<Transaction>> getTransactionByIban(@PathVariable(value = "id") long id) {
         return ResponseEntity.ok(transactionService.getAcceptedTransactionByIban(id));
     }
-
 }

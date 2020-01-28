@@ -22,12 +22,14 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
     private BankAccountClient bankAccountClient;
     private NotificationService notificationService;
+    private boolean errorsOn;
 
     @Autowired
     public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient, NotificationService notificationService) {
         this.transactionRepository = transactionRepository;
         this.bankAccountClient = bankAccountClient;
         this.notificationService = notificationService;
+        this.errorsOn = false;
     }
 
     public ResponseEntity<HttpStatus> makeTransaction(final TransactionRequest transactionRequest) {
@@ -42,10 +44,12 @@ public class TransactionService {
             transaction.setSource(bankAccountSrc);
             transaction.setAmount(transactionRequest.getAmount());
             transaction.setCreatedTransaction(LocalDateTime.now());
-            Random random = new Random();
-            int errorRate = random.nextInt(100);
-            if (errorRate < 20) {
-                throw new DatabaseWriteException("Error due to our fixed rate");
+            if (this.errorsOn) {
+                Random random = new Random();
+                int errorRate = random.nextInt(100);
+                if (errorRate < 20) {
+                    throw new DatabaseWriteException("Error due to our fixed rate");
+                }
             }
             //TODO ADD PARAMETER FOR OVERDRAFT AND WE SHOULD USE PROCEDURE OVER REST
             //IF TWO TRANSACTION IN SAME TIME, IN REST STYLE WE SET BALANCE
@@ -77,5 +81,13 @@ public class TransactionService {
         List<Transaction> allById = transactionRepository.findAllByDestClientAndTransactionState(id, TransactionState.ACCEPTED);
         allById.addAll(transactionRepository.findAllBySourceClientAndTransactionState(id, TransactionState.ACCEPTED));
         return allById;
+    }
+
+    public boolean isErrorsOn() {
+        return errorsOn;
+    }
+
+    public void setErrorsOn(Boolean errorsOn) {
+        this.errorsOn = errorsOn;
     }
 }
