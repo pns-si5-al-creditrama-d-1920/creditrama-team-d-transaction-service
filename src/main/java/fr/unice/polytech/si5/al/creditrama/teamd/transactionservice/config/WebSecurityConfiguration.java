@@ -20,7 +20,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 "/webjars/**",
                 "/register",
                 "/dump",
-                "/writeerror");
+                "/writeerror",
+                "/errorrate");
 
     }
 

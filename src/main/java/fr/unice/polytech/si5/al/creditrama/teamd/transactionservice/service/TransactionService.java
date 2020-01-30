@@ -23,6 +23,7 @@ public class TransactionService {
     private BankAccountClient bankAccountClient;
     private NotificationService notificationService;
     private boolean errorsOn;
+    private int errorRate;
 
     @Autowired
     public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient, NotificationService notificationService) {
@@ -30,6 +31,7 @@ public class TransactionService {
         this.bankAccountClient = bankAccountClient;
         this.notificationService = notificationService;
         this.errorsOn = false;
+        this.errorRate = 5;
     }
 
     public ResponseEntity<HttpStatus> makeTransaction(final TransactionRequest transactionRequest) {
@@ -46,8 +48,8 @@ public class TransactionService {
             transaction.setCreatedTransaction(LocalDateTime.now());
             if (this.errorsOn) {
                 Random random = new Random();
-                int errorRate = random.nextInt(100);
-                if (errorRate < 20) {
+                int randomNumber = random.nextInt(100) + 1;
+                if (randomNumber <= this.errorRate) {
                     throw new DatabaseWriteException("Error due to our fixed rate");
                 }
             }
@@ -89,5 +91,13 @@ public class TransactionService {
 
     public void setErrorsOn(Boolean errorsOn) {
         this.errorsOn = errorsOn;
+    }
+
+    public int getErrorRate() {
+        return errorRate;
+    }
+
+    public void setErrorRate(int errorRate) {
+        this.errorRate = errorRate;
     }
 }
