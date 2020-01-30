@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -27,7 +28,7 @@ public class TransactionService {
         this.notificationService = notificationService;
     }
 
-    public void makeTransaction(final TransactionRequest transactionRequest) {
+    public Transaction makeTransaction(final TransactionRequest transactionRequest) {
         Transaction transaction = new Transaction();
         transaction.setUuid(UUID.randomUUID().toString().replace("-", ""));
         transaction.setTransactionState(TransactionState.PENDING);
@@ -58,6 +59,7 @@ public class TransactionService {
         }
         transactionRepository.save(transaction);
         notificationService.sendMail(transaction);
+        return transaction;
     }
 
     public List<Transaction> getAcceptedTransactionByIban(String iban) {
@@ -70,5 +72,17 @@ public class TransactionService {
         List<Transaction> allById = transactionRepository.findAllByDestClientAndTransactionState(id, TransactionState.ACCEPTED);
         allById.addAll(transactionRepository.findAllBySourceClientAndTransactionState(id, TransactionState.ACCEPTED));
         return allById;
+    }
+
+    public boolean confirmCode(String uuid, short code) {
+        Optional<Transaction> transactionOpt = transactionRepository.findById(uuid);
+        if (!transactionOpt.isPresent() || transactionOpt.get().getCode() != code) {
+            return false;
+        }
+        Transaction transaction = transactionOpt.get();
+        transaction.setCode((short) 0);
+        transaction.setTransactionState(TransactionState.ACCEPTED);
+        transactionRepository.save(transaction);
+        return true;
     }
 }

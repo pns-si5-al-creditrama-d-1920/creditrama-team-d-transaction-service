@@ -2,6 +2,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.controller;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionResponse;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,16 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions")
-    public void createTransaction(@RequestBody TransactionRequest transaction) {
-        transactionService.makeTransaction(transaction);
+    public ResponseEntity<TransactionResponse> createTransaction(@RequestBody TransactionRequest transactionRequest) {
+        Transaction transaction = transactionService.makeTransaction(transactionRequest);
+        return ResponseEntity.ok(TransactionResponse.builder()
+                .uuid(transaction.getUuid())
+                .code(transaction.getCode() != 0).build());
+    }
+
+    @PatchMapping("/transactions/{uuid}/code")
+    public ResponseEntity<Boolean> confirmCode(@RequestParam(value = "code") String code, @PathVariable(value = "uuid") String uuid) {
+        return ResponseEntity.ok(transactionService.confirmCode(uuid, Short.parseShort(code)));
     }
 
     @GetMapping("/transactions/{iban}")
