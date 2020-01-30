@@ -29,4 +29,5 @@ public class Transaction {
 
     private TransactionState transactionState;
 
+    private short code;
 }
