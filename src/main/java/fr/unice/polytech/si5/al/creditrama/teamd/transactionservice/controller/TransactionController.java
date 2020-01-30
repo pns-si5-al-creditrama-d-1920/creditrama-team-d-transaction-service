@@ -42,4 +42,26 @@ public class TransactionController {
     public ResponseEntity<List<Transaction>> getTransactionByIban(@PathVariable(value = "id") long id) {
         return ResponseEntity.ok(transactionService.getAcceptedTransactionByIban(id));
     }
+
+    @GetMapping("/writeerror")
+    public ResponseEntity<Boolean> getTransactionErrors() {
+        return ResponseEntity.ok(transactionService.isErrorsOn());
+    }
+
+    @PostMapping("/writeerror")
+    public ResponseEntity<Boolean> setTransactionErrors(@RequestBody Boolean state) {
+        transactionService.setErrorsOn(state);
+        return ResponseEntity.ok(transactionService.isErrorsOn());
+    }
+
+    @GetMapping("/errorrate")
+    public ResponseEntity<Integer> getErrorRate() {
+        return ResponseEntity.ok(transactionService.getErrorRate());
+    }
+
+    @PostMapping("/errorrate")
+    public ResponseEntity<Integer> setErrorRate(@RequestBody Integer newRate) {
+        transactionService.setErrorRate(newRate);
+        return ResponseEntity.ok(transactionService.getErrorRate());
+    }
 }
