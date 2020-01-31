@@ -1,12 +1,14 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ReceiveTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,23 +18,37 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TransactionService {
     private TransactionRepository transactionRepository;
     private BankAccountClient bankAccountClient;
     private NotificationService notificationService;
+    private CommandGateway commandGateway;
     private boolean errorsOn;
     private int errorRate;
 
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient, NotificationService notificationService) {
+    public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient, NotificationService notificationService, CommandGateway commandGateway) {
         this.transactionRepository = transactionRepository;
         this.bankAccountClient = bankAccountClient;
         this.notificationService = notificationService;
         this.errorsOn = false;
         this.errorRate = 5;
+        this.commandGateway = commandGateway;
     }
+
+    /* SAGA ADDED */
+    public CompletableFuture<String> createTransaction(TransactionRequest transactionRequest) {
+        String uuid = UUID.randomUUID().toString();
+
+        System.out.println("transaction request " + transactionRequest.toString());
+        System.out.println("command gateway : " + commandGateway.toString());
+        return commandGateway.send(new ReceiveTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(), transactionRequest.getAmount()));
+    }
+
+    /* SAGA ADDED */
 
     public ResponseEntity<HttpStatus> makeTransaction(final TransactionRequest transactionRequest) {
         Transaction transaction = new Transaction();

@@ -21,8 +21,9 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions")
-    public ResponseEntity<HttpStatus> createTransaction(@RequestBody TransactionRequest transaction) {
-        return transactionService.makeTransaction(transaction);
+    public ResponseEntity createTransaction(@RequestBody TransactionRequest transaction) {
+        transactionService.createTransaction(transaction);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/transactions/{iban}")
