@@ -1,12 +1,15 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ReceiveTransactionCommand;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TransactionService {
@@ -27,6 +32,17 @@ public class TransactionService {
         this.bankAccountClient = bankAccountClient;
         this.notificationService = notificationService;
     }
+
+    /* SAGA ADDED */
+    public CompletableFuture<String> createTransaction(TransactionRequest transactionRequest) {
+        String uuid = UUID.randomUUID().toString();
+
+        System.out.println("transaction request " + transactionRequest.toString());
+        System.out.println("command gateway : " + commandGateway.toString());
+        return commandGateway.send(new ReceiveTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(), transactionRequest.getAmount()));
+    }
+
+    /* SAGA ADDED */
 
     public Transaction makeTransaction(final TransactionRequest transactionRequest) {
         Transaction transaction = new Transaction();

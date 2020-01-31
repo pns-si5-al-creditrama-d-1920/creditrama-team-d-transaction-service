@@ -16,6 +16,11 @@ spring:
         binder:
           brokers:
             - ${KAFKA_BROKER:localhost}
+
+axon:
+  axonserver:
+    servers: "https://axonserver-al-team-d.apps.jboss.team/"
+
 security:
   oauth2:
     resource:
