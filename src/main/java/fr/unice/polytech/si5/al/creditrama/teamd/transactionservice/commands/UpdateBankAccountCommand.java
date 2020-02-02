@@ -12,6 +12,7 @@ public class UpdateBankAccountCommand {
 
     private Transaction transaction;
 
+
     public UpdateBankAccountCommand(String uuid, Transaction transaction) {
         this.transaction = transaction;
         this.uuid = uuid;

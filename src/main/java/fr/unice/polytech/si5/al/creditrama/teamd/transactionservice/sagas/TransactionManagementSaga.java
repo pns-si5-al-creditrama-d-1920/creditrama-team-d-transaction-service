@@ -14,6 +14,7 @@ import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Saga;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -27,13 +28,13 @@ import javax.inject.Inject;
 public class TransactionManagementSaga {
     //TODO add confirmation code to SAGA
 
-    @Inject
+    @Autowired
     private transient CommandGateway commandGateway;
 
-    @Inject
+    @Autowired
     private BankAccountClient bankAccountClient;
 
-    @Inject
+    @Autowired
     private TransactionRepository transactionRepository;
 
     public TransactionManagementSaga() {
@@ -101,7 +102,7 @@ public class TransactionManagementSaga {
         SagaLifecycle.associateWith("uuid", uuid);
 
         //send next event
-        commandGateway.send(new StoreTransactionCommand(uuid, transaction, transactionRepository));
+        commandGateway.send(new StoreTransactionCommand(uuid, transaction));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -125,7 +126,6 @@ public class TransactionManagementSaga {
     @EndSaga
     public void handle(TransactionApprovedEvent transactionApprovedEvent) {
         System.out.println("Saga invoked TransactionApprovedEvent");
-
         System.out.println("Transaction approved ! " + transactionApprovedEvent.getUuid());
     }
 

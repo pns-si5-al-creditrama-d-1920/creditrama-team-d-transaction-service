@@ -6,6 +6,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.Trans
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -32,14 +33,15 @@ public class StoreTransactionAggregate {
         this.errorRate = 5;
     }
 
+    //MEMO : when interfaces are passed onto the constructor annotated with @CommandHandler they are automatically autowired
     @CommandHandler
-    public StoreTransactionAggregate(StoreTransactionCommand storeTransactionCommand) throws DatabaseWriteException {
+    public StoreTransactionAggregate(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) throws DatabaseWriteException {
         System.out.println("Dans @CommandHandler ApproveTransactionAggregate " + storeTransactionCommand.toString());
         Transaction transaction = storeTransactionCommand.getTransaction();
         transaction.setTransactionState(TransactionState.ACCEPTED);
 
         //save transaction
-        storeTransactionCommand.getTransactionRepository().save(transaction);
+        transactionRepository.save(transaction);
 
         //FIXME 2 else needed ?
         //there was an error
