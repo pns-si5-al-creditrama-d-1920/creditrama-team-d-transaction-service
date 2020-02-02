@@ -4,7 +4,6 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankA
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
-import javax.inject.Inject;
 
 //TODO investiguer sur les SAGA stores
 // NOTE : si 2 fois le même aggregate identifier à la même value : error, explications :
@@ -43,20 +41,16 @@ public class TransactionManagementSaga {
     //TODO create custom exceptions
     @StartSaga
     @SagaEventHandler(associationProperty = "transactionUuid")
-    public void handle(TransactionReceivedEvent transactionReceivedEvent) throws Exception {
-        System.out.println("Saga invoked TransactionReceivedEvent");
-        System.out.println("transaction event : " + transactionReceivedEvent + "bankAccountClient : " + bankAccountClient);
-
-        BankAccount bankAccountSrc = bankAccountClient.getBankAccount(transactionReceivedEvent.getSourceIban());
-        BankAccount bankAccountDst = bankAccountClient.getBankAccount(transactionReceivedEvent.getDestIban());
+    public void handle(TransactionReceivedEvent transactionReceivedEvent) {
+        System.out.println("Saga invoked TransactionReceivedEvent " + transactionReceivedEvent);
 
         //associate Saga
         String uuid = UUID.randomUUID().toString();
         SagaLifecycle.associateWith("uuid", uuid);
 
         //send next event
-        commandGateway.send(new CreateTransactionCommand(uuid, bankAccountSrc, bankAccountDst,
-                transactionReceivedEvent.getAmount(), LocalDateTime.now(), TransactionState.PENDING));
+        commandGateway.send(new CreateTransactionCommand(uuid, transactionReceivedEvent.getSourceIban(), transactionReceivedEvent.getDestIban(),
+                transactionReceivedEvent.getAmount(), LocalDateTime.now(), TransactionState.PENDING, (short) (new Random().nextInt(9000) + 1000)));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -126,6 +120,12 @@ public class TransactionManagementSaga {
     @EndSaga
     public void handle(TransactionApprovedEvent transactionApprovedEvent) {
         System.out.println("Saga invoked TransactionApprovedEvent");
+
+        Transaction transaction = transactionApprovedEvent.getTransaction();
+        transaction.setTransactionState(TransactionState.ACCEPTED);
+
+        transactionRepository.save(transaction);
+
         System.out.println("Transaction approved ! " + transactionApprovedEvent.getUuid());
     }
 

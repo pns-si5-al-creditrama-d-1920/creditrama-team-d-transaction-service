@@ -49,4 +49,10 @@ public class UpdateBankAccountAggregate {
         this.uuid = updatedBankAccountEvent.getUuid();
         this.transaction = updatedBankAccountEvent.getTransaction();
     }
+
+    @EventSourcingHandler
+    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
+        this.uuid = transactionRejectedEvent.getUuid();
+        this.transaction = transactionRejectedEvent.getTransaction();
+    }
 }

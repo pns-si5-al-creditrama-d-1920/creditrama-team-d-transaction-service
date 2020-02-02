@@ -46,4 +46,10 @@ public class TransactionValidityCheckAggregate {
         this.uuid = transactionValidityCheckedEvent.getUuid();
         this.transaction = transactionValidityCheckedEvent.getTransaction();
     }
+
+    @EventSourcingHandler
+    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
+        this.uuid = transactionRejectedEvent.getUuid();
+        this.transaction = transactionRejectedEvent.getTransaction();
+    }
 }

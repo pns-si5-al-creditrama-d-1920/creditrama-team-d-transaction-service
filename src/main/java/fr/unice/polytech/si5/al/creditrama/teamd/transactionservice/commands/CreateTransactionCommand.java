@@ -1,6 +1,5 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
 
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
@@ -13,9 +12,9 @@ public class CreateTransactionCommand {
     @TargetAggregateIdentifier
     private String uuid;
 
-    private BankAccount sourceAccount;
+    private String sourceAccount;
 
-    private BankAccount destAccount;
+    private String destAccount;
 
     private double amount;
 
@@ -23,24 +22,27 @@ public class CreateTransactionCommand {
 
     private TransactionState transactionState;
 
-    public CreateTransactionCommand(String uuid, BankAccount sourceAccount, BankAccount destAccount, double amount, LocalDateTime createdTransaction, TransactionState transactionState) {
+    private short code;
+
+    public CreateTransactionCommand(String uuid, String sourceAccount, String destAccount, double amount, LocalDateTime createdTransaction, TransactionState transactionState, short code) {
         this.uuid = uuid;
         this.sourceAccount = sourceAccount;
         this.destAccount = destAccount;
         this.amount = amount;
         this.createdTransaction = createdTransaction;
         this.transactionState = transactionState;
+        this.code = code;
     }
 
     public String getUuid() {
         return uuid;
     }
 
-    public BankAccount getSource() {
+    public String getSource() {
         return sourceAccount;
     }
 
-    public BankAccount getDest() {
+    public String getDest() {
         return destAccount;
     }
 
@@ -54,5 +56,13 @@ public class CreateTransactionCommand {
 
     public TransactionState getTransactionState() {
         return transactionState;
+    }
+
+    public short getCode() {
+        return code;
+    }
+
+    public void setCode(short code) {
+        this.code = code;
     }
 }

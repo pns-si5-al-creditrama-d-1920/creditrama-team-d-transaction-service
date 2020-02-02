@@ -22,13 +22,16 @@ public class TransactionCreatedEvent {
 
     private TransactionState transactionState;
 
-    public TransactionCreatedEvent(String uuid, BankAccount source, BankAccount dest, double amount, LocalDateTime createdTransaction, TransactionState transactionState) {
+    private short code;
+
+    public TransactionCreatedEvent(String uuid, BankAccount source, BankAccount dest, double amount, LocalDateTime createdTransaction, TransactionState transactionState, short code) {
         this.uuid = uuid;
         this.source = source;
         this.dest = dest;
         this.amount = amount;
         this.createdTransaction = createdTransaction;
         this.transactionState = transactionState;
+        this.code = code;
         System.out.println("l'event est créé : ");
     }
 
@@ -56,7 +59,15 @@ public class TransactionCreatedEvent {
         return transactionState;
     }
 
+    public short getCode() {
+        return code;
+    }
+
+    public void setCode(short code) {
+        this.code = code;
+    }
+
     public Transaction getTransaction() {
-        return new Transaction(this.uuid, this.source, this.dest, this.amount, this.createdTransaction, this.transactionState);
+        return new Transaction(this.uuid, this.source, this.dest, this.amount, this.createdTransaction, this.transactionState, this.code);
     }
 }

@@ -29,16 +29,17 @@ public class StoreTransactionAggregate {
 
     public StoreTransactionAggregate() {
         // Required by Axon to build a default Aggregate prior to Event Sourcing
-        this.errorsOn = false;
+        this.errorsOn = true;
         this.errorRate = 5;
     }
 
     //MEMO : when interfaces are passed onto the constructor annotated with @CommandHandler they are automatically autowired
     @CommandHandler
     public StoreTransactionAggregate(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) throws DatabaseWriteException {
-        System.out.println("Dans @CommandHandler ApproveTransactionAggregate " + storeTransactionCommand.toString());
+        System.out.println("Dans @CommandHandler StoreTransactionCommand " + storeTransactionCommand.toString());
         Transaction transaction = storeTransactionCommand.getTransaction();
         transaction.setTransactionState(TransactionState.ACCEPTED);
+        this.errorsOn = true;
 
         //save transaction
         transactionRepository.save(transaction);
@@ -47,13 +48,13 @@ public class StoreTransactionAggregate {
         //there was an error
         if (this.errorsOn) {
             Random random = new Random();
-            int randomNumber = random.nextInt(100) + 1;
-            if (randomNumber <= this.errorRate) {
+            // int randomNumber = random.nextInt(100) + 1;
+           /* if (randomNumber <= this.errorRate) {
                 // throw new DatabaseWriteException("Error due to our fixed rate");
                 apply(new TransactionStorageCancelledEvent(storeTransactionCommand.getUuid(), transaction));
-            } else {
-                apply(new TransactionApprovedEvent(storeTransactionCommand.getUuid(), transaction));
-            }
+            } else {*/
+            apply(new TransactionStorageCancelledEvent(storeTransactionCommand.getUuid(), transaction));
+            //           }
         } else {
             apply(new TransactionApprovedEvent(storeTransactionCommand.getUuid(), transaction));
         }
@@ -64,7 +65,16 @@ public class StoreTransactionAggregate {
         System.out.println("Dans @EventSourcingHandler on " + transactionApprovedEvent.toString());
         this.transaction = transactionApprovedEvent.getTransaction();
         this.uuid = transactionApprovedEvent.getUuid();
-        this.errorsOn = false;
+        this.errorsOn = true;
+        this.errorRate = 5;
+    }
+
+    @EventSourcingHandler
+    protected void on(TransactionStorageCancelledEvent transactionStorageCancelledEvent) {
+        System.out.println("Dans @EventSourcingHandler on " + transactionStorageCancelledEvent.toString());
+        this.transaction = transactionStorageCancelledEvent.getTransaction();
+        this.uuid = transactionStorageCancelledEvent.getUuid();
+        this.errorsOn = true;
         this.errorRate = 5;
     }
 
@@ -74,5 +84,13 @@ public class StoreTransactionAggregate {
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

@@ -1,5 +1,6 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.aggregators;
 
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.CreateTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionCreatedEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
@@ -19,9 +20,9 @@ public class TransactionAggregate {
     @AggregateIdentifier
     private String uuid;
 
-    private BankAccount source;
+    private String source;
 
-    private BankAccount dest;
+    private String dest;
 
     private double amount;
 
@@ -29,27 +30,34 @@ public class TransactionAggregate {
 
     private TransactionState transactionState;
 
+    private short code;
+
     public TransactionAggregate() {
         // Required by Axon to build a default Aggregate prior to Event Sourcing
     }
 
     @CommandHandler
-    public TransactionAggregate(CreateTransactionCommand createTransactionCommand) {
+    public TransactionAggregate(CreateTransactionCommand createTransactionCommand, BankAccountClient bankAccountClient) {
         System.out.println("Dans @CommandHandler TransactionAggregate " + createTransactionCommand.toString());
-        apply(new TransactionCreatedEvent(createTransactionCommand.getUuid(), createTransactionCommand.getSource(),
-                createTransactionCommand.getDest(), createTransactionCommand.getAmount(),
-                createTransactionCommand.getCreatedTransaction(), createTransactionCommand.getTransactionState()));
+
+        BankAccount bankAccountSrc = bankAccountClient.getBankAccount(createTransactionCommand.getSource());
+        BankAccount bankAccountDst = bankAccountClient.getBankAccount(createTransactionCommand.getSource());
+
+        apply(new TransactionCreatedEvent(createTransactionCommand.getUuid(), bankAccountSrc,
+                bankAccountDst, createTransactionCommand.getAmount(),
+                createTransactionCommand.getCreatedTransaction(), createTransactionCommand.getTransactionState(), createTransactionCommand.getCode()));
     }
 
     @EventSourcingHandler
     protected void on(TransactionCreatedEvent transactionCreatedEvent) {
         System.out.println("Dans @EventSourcingHandler on " + transactionCreatedEvent.toString());
         this.uuid = transactionCreatedEvent.getUuid();
-        this.source = transactionCreatedEvent.getSource();
-        this.dest = transactionCreatedEvent.getDest();
+        this.source = transactionCreatedEvent.getSource().getIban();
+        this.dest = transactionCreatedEvent.getDest().getIban();
         this.amount = transactionCreatedEvent.getAmount();
         this.createdTransaction = transactionCreatedEvent.getCreatedTransaction();
         this.transactionState = transactionCreatedEvent.getTransactionState();
+        this.code = code;
     }
 }
 

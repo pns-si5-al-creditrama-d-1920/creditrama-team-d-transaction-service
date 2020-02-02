@@ -1,7 +1,6 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 

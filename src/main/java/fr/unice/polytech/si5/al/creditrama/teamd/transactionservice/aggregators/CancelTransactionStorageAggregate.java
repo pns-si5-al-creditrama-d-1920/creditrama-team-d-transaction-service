@@ -41,6 +41,6 @@ public class CancelTransactionStorageAggregate {
     protected void on(TransactionStorageCancelledEvent transactionStorageCancelledEvent) {
         System.out.println("Dans @EventSourcingHandler on " + transactionStorageCancelledEvent.toString());
         this.transaction = transactionStorageCancelledEvent.getTransaction();
-        this.uuid = uuid;
+        this.uuid = transactionStorageCancelledEvent.getUuid();
     }
 }

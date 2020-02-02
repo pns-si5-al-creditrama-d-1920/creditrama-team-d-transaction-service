@@ -2,7 +2,6 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ReceiveTransactionCommand;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
@@ -18,19 +17,20 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TransactionService {
     private TransactionRepository transactionRepository;
     private BankAccountClient bankAccountClient;
     private NotificationService notificationService;
+    private CommandGateway commandGateway;
 
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient, NotificationService notificationService) {
+    public TransactionService(TransactionRepository transactionRepository, BankAccountClient bankAccountClient, NotificationService notificationService, CommandGateway commandGateway) {
         this.transactionRepository = transactionRepository;
         this.bankAccountClient = bankAccountClient;
         this.notificationService = notificationService;
+        this.commandGateway = commandGateway;
     }
 
     /* SAGA ADDED */
