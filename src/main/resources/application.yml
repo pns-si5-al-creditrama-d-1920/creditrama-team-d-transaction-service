@@ -14,6 +14,9 @@ spring:
         binder:
           brokers:
             - ${KAFKA_BROKER:localhost}
+axon:
+  axonserver:
+    servers: "localhost"
 
 security:
   oauth2:
