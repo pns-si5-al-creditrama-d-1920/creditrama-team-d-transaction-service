@@ -12,12 +12,9 @@ public class StoreTransactionCommand {
 
     private Transaction transaction;
 
-    private TransactionRepository transactionRepository;
-
-    public StoreTransactionCommand(String uuid, Transaction transaction, TransactionRepository transactionRepository) {
+    public StoreTransactionCommand(String uuid, Transaction transaction) {
         this.transaction = transaction;
         this.uuid = uuid;
-        this.transactionRepository = transactionRepository;
     }
 
     public Transaction getTransaction() {
@@ -30,13 +27,5 @@ public class StoreTransactionCommand {
 
     public String getUuid() {
         return uuid;
-    }
-
-    public TransactionRepository getTransactionRepository() {
-        return transactionRepository;
-    }
-
-    public void setTransactionRepository(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
     }
 }
