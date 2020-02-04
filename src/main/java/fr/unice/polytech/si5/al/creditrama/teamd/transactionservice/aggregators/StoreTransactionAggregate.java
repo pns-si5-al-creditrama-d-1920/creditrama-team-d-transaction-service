@@ -3,6 +3,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.aggregators
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.StoreTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionApprovedEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionStorageCancelledEvent;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.VerificationCodeNeeded;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
@@ -39,7 +40,7 @@ public class StoreTransactionAggregate {
         System.out.println("Dans @CommandHandler StoreTransactionCommand " + storeTransactionCommand.toString());
         Transaction transaction = storeTransactionCommand.getTransaction();
         transaction.setTransactionState(TransactionState.ACCEPTED);
-        this.errorsOn = true;
+        this.errorsOn = false;
 
         //save transaction
         transactionRepository.save(transaction);
@@ -56,7 +57,11 @@ public class StoreTransactionAggregate {
             apply(new TransactionStorageCancelledEvent(storeTransactionCommand.getUuid(), transaction));
             //           }
         } else {
-            apply(new TransactionApprovedEvent(storeTransactionCommand.getUuid(), transaction));
+            if (storeTransactionCommand.getTransaction().getAmount() >= 10) {
+                apply(new VerificationCodeNeeded(storeTransactionCommand.getUuid(), transaction));
+            } else {
+                apply(new TransactionApprovedEvent(storeTransactionCommand.getUuid(), transaction));
+            }
         }
     }
 
@@ -65,6 +70,15 @@ public class StoreTransactionAggregate {
         System.out.println("Dans @EventSourcingHandler on " + transactionApprovedEvent.toString());
         this.transaction = transactionApprovedEvent.getTransaction();
         this.uuid = transactionApprovedEvent.getUuid();
+        this.errorsOn = true;
+        this.errorRate = 5;
+    }
+
+    @EventSourcingHandler
+    protected void on(VerificationCodeNeeded verificationCodeNeeded) {
+        System.out.println("Dans @EventSourcingHandler on " + verificationCodeNeeded.toString());
+        this.transaction = verificationCodeNeeded.getTransaction();
+        this.uuid = verificationCodeNeeded.getUuid();
         this.errorsOn = true;
         this.errorRate = 5;
     }

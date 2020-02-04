@@ -85,6 +85,34 @@ public class TransactionManagementSaga {
     }
 
     @SagaEventHandler(associationProperty = "uuid")
+    public void handle(VerificationCodeNeeded verificationCodeNeeded) throws DatabaseWriteException {
+        System.out.println("Saga invoked VerificationCodeNeeded");
+
+        Transaction transaction = verificationCodeNeeded.getTransaction();
+
+        //associate Saga
+        String uuid = UUID.randomUUID().toString();
+        transaction.setUuid(uuid);
+        SagaLifecycle.associateWith("uuid", uuid);
+
+        System.out.println("Waiting for verification code...");
+    }
+
+    @SagaEventHandler(associationProperty = "uuid")
+    @EndSaga
+    public void handle(CodeConfirmedEvent codeConfirmedEvent) {
+        System.out.println("Saga invoked CodeConfirmedEvent");
+
+        Transaction transaction = codeConfirmedEvent.getTransaction();
+        transaction.setTransactionState(TransactionState.ACCEPTED);
+
+        transactionRepository.save(transaction);
+
+        System.out.println("Transaction approved after code verification ! " + codeConfirmedEvent.getUuid());
+
+    }
+
+    @SagaEventHandler(associationProperty = "uuid")
     public void handle(UpdatedBankAccountEvent updatedBankAccountEvent) throws DatabaseWriteException {
         System.out.println("Saga invoked UpdatedBankAccountEvent");
 

@@ -1,6 +1,7 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ConfirmCodeCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ReceiveTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
@@ -90,7 +91,7 @@ public class TransactionService {
         return allById;
     }
 
-    public boolean confirmCode(String uuid, short code) {
+    public boolean oldConfirmCode(String uuid, short code) {
         Optional<Transaction> transactionOpt = transactionRepository.findById(uuid);
         if (!transactionOpt.isPresent() || transactionOpt.get().getCode() != code) {
             return false;
@@ -100,5 +101,9 @@ public class TransactionService {
         transaction.setTransactionState(TransactionState.ACCEPTED);
         transactionRepository.save(transaction);
         return true;
+    }
+
+    public void confirmCode(String uuid, short code) {
+        commandGateway.send(new ConfirmCodeCommand(uuid, code));
     }
 }
