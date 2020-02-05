@@ -3,7 +3,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.aggregators
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ReceiveTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionReceivedEvent;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 
@@ -35,7 +35,7 @@ public class TransactionRequestAggregate {
     }
 
     /* As all the Event Sourcing Handlers combined will form the Aggregate, this is where all the state changes happen. */
-    @EventSourcingHandler
+    @EventHandler
     protected void on(TransactionReceivedEvent transactionReceivedEvent) {
         System.out.println("Dans @EventSourcingHandler on " + transactionReceivedEvent.toString());
         this.uuid = transactionReceivedEvent.getTransactionUuid();

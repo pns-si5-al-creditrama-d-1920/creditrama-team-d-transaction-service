@@ -6,9 +6,9 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.Trans
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.VerificationCodeNeeded;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
@@ -39,7 +39,7 @@ public class StoreTransactionAggregate {
     public StoreTransactionAggregate(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) throws DatabaseWriteException {
         System.out.println("Dans @CommandHandler StoreTransactionCommand " + storeTransactionCommand.toString());
         Transaction transaction = storeTransactionCommand.getTransaction();
-        transaction.setTransactionState(TransactionState.ACCEPTED);
+        //transaction.setTransactionState(TransactionState.ACCEPTED);
         this.errorsOn = false;
 
         //save transaction
@@ -57,7 +57,7 @@ public class StoreTransactionAggregate {
             apply(new TransactionStorageCancelledEvent(storeTransactionCommand.getUuid(), transaction));
             //           }
         } else {
-            if (storeTransactionCommand.getTransaction().getAmount() >= 10) {
+            if (storeTransactionCommand.getTransaction().getAmount() >= 10.0) {
                 apply(new VerificationCodeNeeded(storeTransactionCommand.getUuid(), transaction));
             } else {
                 apply(new TransactionApprovedEvent(storeTransactionCommand.getUuid(), transaction));
@@ -65,31 +65,25 @@ public class StoreTransactionAggregate {
         }
     }
 
-    @EventSourcingHandler
+    @EventHandler
     protected void on(TransactionApprovedEvent transactionApprovedEvent) {
         System.out.println("Dans @EventSourcingHandler on " + transactionApprovedEvent.toString());
         this.transaction = transactionApprovedEvent.getTransaction();
         this.uuid = transactionApprovedEvent.getUuid();
-        this.errorsOn = true;
-        this.errorRate = 5;
     }
 
-    @EventSourcingHandler
+    @EventHandler
     protected void on(VerificationCodeNeeded verificationCodeNeeded) {
         System.out.println("Dans @EventSourcingHandler on " + verificationCodeNeeded.toString());
         this.transaction = verificationCodeNeeded.getTransaction();
         this.uuid = verificationCodeNeeded.getUuid();
-        this.errorsOn = true;
-        this.errorRate = 5;
     }
 
-    @EventSourcingHandler
+    @EventHandler
     protected void on(TransactionStorageCancelledEvent transactionStorageCancelledEvent) {
         System.out.println("Dans @EventSourcingHandler on " + transactionStorageCancelledEvent.toString());
         this.transaction = transactionStorageCancelledEvent.getTransaction();
         this.uuid = transactionStorageCancelledEvent.getUuid();
-        this.errorsOn = true;
-        this.errorRate = 5;
     }
 
     public Transaction getTransaction() {

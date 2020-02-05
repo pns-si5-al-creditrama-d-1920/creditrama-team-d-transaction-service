@@ -3,10 +3,10 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.sagas;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.*;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
+import org.axonframework.eventhandling.DisallowReplay;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.SagaLifecycle;
@@ -22,9 +22,9 @@ import java.util.UUID;
 //TODO investiguer sur les SAGA stores
 // NOTE : si 2 fois le même aggregate identifier à la même value : error, explications :
 // https://medium.com/@gushakov/discovering-cqrs-and-event-sourcing-with-axon-framework-afb3782e39c7
+
 @Saga
 public class TransactionManagementSaga {
-    //TODO add confirmation code to SAGA
 
     @Autowired
     private transient CommandGateway commandGateway;
@@ -39,6 +39,7 @@ public class TransactionManagementSaga {
     }
 
     //TODO create custom exceptions
+    @DisallowReplay
     @StartSaga
     @SagaEventHandler(associationProperty = "transactionUuid")
     public void handle(TransactionReceivedEvent transactionReceivedEvent) {
@@ -53,97 +54,72 @@ public class TransactionManagementSaga {
                 transactionReceivedEvent.getAmount(), LocalDateTime.now(), TransactionState.PENDING, (short) (new Random().nextInt(9000) + 1000)));
     }
 
+    @DisallowReplay
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionCreatedEvent transactionCreatedEvent) {
-        System.out.println("Saga invoked TransactionCreatedEvent");
-        System.out.println("transaction id" + transactionCreatedEvent.getUuid());
-
+        System.out.println("Saga invoked TransactionCreatedEvent" + transactionCreatedEvent.getUuid());
         Transaction transaction = transactionCreatedEvent.getTransaction();
 
-        //associate Saga
         String uuid = UUID.randomUUID().toString();
-        transaction.setUuid(uuid);
         SagaLifecycle.associateWith("uuid", uuid);
 
-        //send next event
         commandGateway.send(new TransactionValidityCheckCommand(uuid, transaction));
     }
 
+    @DisallowReplay
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionValidityCheckedEvent transactionValidityCheckedEvent) {
         System.out.println("Saga invoked TransactionValidityCheckedEvent");
-
         Transaction transaction = transactionValidityCheckedEvent.getTransaction();
 
-        //associate Saga
         String uuid = UUID.randomUUID().toString();
-        transaction.setUuid(uuid);
         SagaLifecycle.associateWith("uuid", uuid);
 
-        //send next event
         commandGateway.send(new UpdateBankAccountCommand(uuid, transaction));
     }
 
+    @DisallowReplay
     @SagaEventHandler(associationProperty = "uuid")
-    public void handle(VerificationCodeNeeded verificationCodeNeeded) throws DatabaseWriteException {
-        System.out.println("Saga invoked VerificationCodeNeeded");
-
-        Transaction transaction = verificationCodeNeeded.getTransaction();
-
-        //associate Saga
-        String uuid = UUID.randomUUID().toString();
-        transaction.setUuid(uuid);
-        SagaLifecycle.associateWith("uuid", uuid);
-
-        System.out.println("Waiting for verification code...");
-    }
-
-    @SagaEventHandler(associationProperty = "uuid")
-    @EndSaga
-    public void handle(CodeConfirmedEvent codeConfirmedEvent) {
-        System.out.println("Saga invoked CodeConfirmedEvent");
-
-        Transaction transaction = codeConfirmedEvent.getTransaction();
-        transaction.setTransactionState(TransactionState.ACCEPTED);
-
-        transactionRepository.save(transaction);
-
-        System.out.println("Transaction approved after code verification ! " + codeConfirmedEvent.getUuid());
-
-    }
-
-    @SagaEventHandler(associationProperty = "uuid")
-    public void handle(UpdatedBankAccountEvent updatedBankAccountEvent) throws DatabaseWriteException {
+    public void handle(UpdatedBankAccountEvent updatedBankAccountEvent) {
         System.out.println("Saga invoked UpdatedBankAccountEvent");
-
         Transaction transaction = updatedBankAccountEvent.getTransaction();
 
-        //associate Saga
         String uuid = UUID.randomUUID().toString();
-        transaction.setUuid(uuid);
         SagaLifecycle.associateWith("uuid", uuid);
 
-        //send next event
         commandGateway.send(new StoreTransactionCommand(uuid, transaction));
     }
 
+    @DisallowReplay
     @SagaEventHandler(associationProperty = "uuid")
-    @EndSaga
+    public void handle(VerificationCodeNeeded verificationCodeNeeded) {
+        System.out.println("Saga invoked VerificationCodeNeeded" + verificationCodeNeeded.toString());
+        System.out.println("Waiting for verification code...");
+    }
+
+    @DisallowReplay
+    @SagaEventHandler(associationProperty = "uuid")
+    public void handle(CodeConfirmedEvent codeConfirmedEvent) {
+        System.out.println("Saga invoked CodeConfirmedEvent");
+
+        String uuid = UUID.randomUUID().toString();
+        SagaLifecycle.associateWith("uuid", uuid);
+
+        commandGateway.send(new ApproveTransactionCommand(uuid, codeConfirmedEvent.getTransaction()));
+    }
+
+    @DisallowReplay
+    @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionStorageCancelledEvent transactionStorageCancelledEvent) {
         System.out.println("Saga invoked TransactionStorageCancelledEvent");
 
-        Transaction transaction = transactionStorageCancelledEvent.getTransaction();
-        transaction.setTransactionState(TransactionState.CANCEL);
+        String uuid = UUID.randomUUID().toString();
+        SagaLifecycle.associateWith("uuid", uuid);
 
-        bankAccountClient.updateBanAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() + transaction.getAmount());
-        bankAccountClient.updateBanAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() - transaction.getAmount());
-
-        transactionRepository.save(transaction);
-
-        System.out.println("Transaction not stored " + transaction.getUuid());
-        //send next event
+        commandGateway.send(new CancelTransactionStorageCommand(uuid, transactionStorageCancelledEvent.getTransaction()));
     }
 
+    @DisallowReplay
     @SagaEventHandler(associationProperty = "uuid")
     @EndSaga
     public void handle(TransactionApprovedEvent transactionApprovedEvent) {
@@ -154,9 +130,10 @@ public class TransactionManagementSaga {
 
         transactionRepository.save(transaction);
 
-        System.out.println("Transaction approved ! " + transactionApprovedEvent.getUuid());
+        //commandGateway.send(new ApproveTransactionCommand(uuid, transactionApprovedEvent.getTransaction()));
     }
 
+    @DisallowReplay
     @SagaEventHandler(associationProperty = "uuid")
     @EndSaga
     public void handle(TransactionRejectedEvent transactionRejectedEvent) {
@@ -167,6 +144,6 @@ public class TransactionManagementSaga {
 
         transactionRepository.save(transaction);
 
-        System.out.println("Transaction rejected ! " + transaction.getUuid());
+        //commandGateway.send(new RejectTransactionCommand(uuid, transactionRejectedEvent.getTransaction()));
     }
 }

@@ -6,7 +6,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.Trans
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.UpdatedBankAccountEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 
@@ -26,31 +26,25 @@ public class UpdateBankAccountAggregate {
     @CommandHandler
     public UpdateBankAccountAggregate(UpdateBankAccountCommand updateBankAccountCommand, BankAccountClient bankAccountClient) {
         System.out.println("Dans @CommandHandler UpdateBankAccountAggregate " + updateBankAccountCommand.toString());
-
         Transaction transaction = updateBankAccountCommand.getTransaction();
-        double srcNewBalance = transaction.getSource().getBalance() - transaction.getAmount();
-        double destNewBalance = transaction.getDest().getBalance() + transaction.getAmount();
 
-        System.out.println("bank client " + bankAccountClient);
+        try {
+            bankAccountClient.updateBankAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() - transaction.getAmount());
+            bankAccountClient.updateBankAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() + transaction.getAmount());
 
-        bankAccountClient.updateBanAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() - transaction.getAmount());
-        bankAccountClient.updateBanAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() + transaction.getAmount());
-
-        if (bankAccountClient.getBankAccount(transaction.getSource().getIban()).getBalance() == srcNewBalance &&
-                bankAccountClient.getBankAccount(transaction.getDest().getIban()).getBalance() == destNewBalance) {
             apply(new UpdatedBankAccountEvent(updateBankAccountCommand.getUuid(), transaction));
-        } else {
+        } catch (Exception e) {
             apply(new TransactionRejectedEvent(updateBankAccountCommand.getUuid(), transaction));
         }
     }
 
-    @EventSourcingHandler
+    @EventHandler
     protected void on(UpdatedBankAccountEvent updatedBankAccountEvent) {
         this.uuid = updatedBankAccountEvent.getUuid();
         this.transaction = updatedBankAccountEvent.getTransaction();
     }
 
-    @EventSourcingHandler
+    @EventHandler
     protected void on(TransactionRejectedEvent transactionRejectedEvent) {
         this.uuid = transactionRejectedEvent.getUuid();
         this.transaction = transactionRejectedEvent.getTransaction();

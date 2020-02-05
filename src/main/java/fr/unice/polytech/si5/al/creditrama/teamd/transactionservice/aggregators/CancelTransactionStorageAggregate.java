@@ -1,13 +1,11 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.aggregators;
 
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.CancelTransactionStorageCommand;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionApprovedEvent;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionStorageCancelledEvent;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.exception.DatabaseWriteException;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionRejectedEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 
@@ -18,7 +16,6 @@ public class CancelTransactionStorageAggregate {
 
     @AggregateIdentifier
     private String uuid;
-
     private Transaction transaction;
 
     public CancelTransactionStorageAggregate() {
@@ -26,21 +23,21 @@ public class CancelTransactionStorageAggregate {
     }
 
     @CommandHandler
-    public CancelTransactionStorageAggregate(CancelTransactionStorageCommand cancelTransactionStorageCommand) {
+    public CancelTransactionStorageAggregate(CancelTransactionStorageCommand cancelTransactionStorageCommand, BankAccountClient bankAccountClient) {
         System.out.println("Dans @CommandHandler CancelTransactionStorageCommand " + cancelTransactionStorageCommand.toString());
-        Transaction transaction = cancelTransactionStorageCommand.getTransaction();
-        transaction.setTransactionState(TransactionState.CANCEL);
+        Transaction t = cancelTransactionStorageCommand.getTransaction();
 
-        //save transaction
-        cancelTransactionStorageCommand.getTransactionRepository().save(transaction);
+        //compensiate accounts
+        bankAccountClient.updateBankAccount(t.getSource().getIban(), t.getSource().getBalance() + t.getAmount());
+        bankAccountClient.updateBankAccount(t.getDest().getIban(), t.getDest().getBalance() - t.getAmount());
 
-        apply(new TransactionStorageCancelledEvent(cancelTransactionStorageCommand.getUuid(), transaction));
+        apply(new TransactionRejectedEvent(cancelTransactionStorageCommand.getUuid(), t));
     }
 
-    @EventSourcingHandler
-    protected void on(TransactionStorageCancelledEvent transactionStorageCancelledEvent) {
-        System.out.println("Dans @EventSourcingHandler on " + transactionStorageCancelledEvent.toString());
-        this.transaction = transactionStorageCancelledEvent.getTransaction();
-        this.uuid = transactionStorageCancelledEvent.getUuid();
+    @EventHandler
+    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
+        System.out.println("Dans @EventSourcingHandler on " + transactionRejectedEvent.toString());
+        this.transaction = transactionRejectedEvent.getTransaction();
+        this.uuid = transactionRejectedEvent.getUuid();
     }
 }

@@ -2,14 +2,11 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.aggregators
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ConfirmCodeCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.CodeConfirmedEvent;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionCreatedEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionRejectedEvent;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 
@@ -42,7 +39,7 @@ public class ConfirmCodeAggregate {
         apply(new CodeConfirmedEvent(confirmCodeCommand.getUuid(), transaction, confirmCodeCommand.getCode()));
     }
 
-    @EventSourcingHandler
+    @EventHandler
     protected void on(CodeConfirmedEvent codeConfirmedEvent) {
         System.out.println("Dans @EventSourcingHandler on " + codeConfirmedEvent.toString());
         this.uuid = codeConfirmedEvent.getUuid();

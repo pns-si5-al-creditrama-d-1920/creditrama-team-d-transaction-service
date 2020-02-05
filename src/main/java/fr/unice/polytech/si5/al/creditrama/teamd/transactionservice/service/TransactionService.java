@@ -64,8 +64,8 @@ public class TransactionService {
                 if (transaction.getAmount() >= 10) {
                     transaction.setCode((short) (new Random().nextInt(9000) + 1000));
                 } else {
-                    bankAccountClient.updateBanAccount(bankAccountSrc.getIban(), bankAccountSrc.getBalance() - transaction.getAmount());
-                    bankAccountClient.updateBanAccount(bankAccountDst.getIban(), bankAccountSrc.getBalance() + transaction.getAmount());
+                    bankAccountClient.updateBankAccount(bankAccountSrc.getIban(), bankAccountSrc.getBalance() - transaction.getAmount());
+                    bankAccountClient.updateBankAccount(bankAccountDst.getIban(), bankAccountSrc.getBalance() + transaction.getAmount());
                     transaction.setTransactionState(TransactionState.ACCEPTED);
                 }
             }

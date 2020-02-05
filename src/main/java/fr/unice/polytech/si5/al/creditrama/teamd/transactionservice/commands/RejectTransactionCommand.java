@@ -3,13 +3,14 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-public class CancelTransactionStorageCommand {
+public class RejectTransactionCommand {
 
     @TargetAggregateIdentifier
     private String uuid;
+
     private Transaction transaction;
 
-    public CancelTransactionStorageCommand(String uuid, Transaction transaction) {
+    public RejectTransactionCommand(String uuid, Transaction transaction) {
         this.transaction = transaction;
         this.uuid = uuid;
     }

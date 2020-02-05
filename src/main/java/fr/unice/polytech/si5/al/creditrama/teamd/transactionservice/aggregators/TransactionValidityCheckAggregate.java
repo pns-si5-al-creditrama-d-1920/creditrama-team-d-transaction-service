@@ -6,7 +6,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.Trans
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.eventsourcing.EventSourcingHandler;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 
@@ -41,15 +41,9 @@ public class TransactionValidityCheckAggregate {
         }
     }
 
-    @EventSourcingHandler
+    @EventHandler
     protected void on(TransactionValidityCheckedEvent transactionValidityCheckedEvent) {
         this.uuid = transactionValidityCheckedEvent.getUuid();
         this.transaction = transactionValidityCheckedEvent.getTransaction();
-    }
-
-    @EventSourcingHandler
-    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
-        this.uuid = transactionRejectedEvent.getUuid();
-        this.transaction = transactionRejectedEvent.getTransaction();
     }
 }
