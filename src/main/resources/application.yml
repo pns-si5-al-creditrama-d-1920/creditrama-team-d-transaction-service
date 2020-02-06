@@ -16,6 +16,8 @@ spring:
         binder:
           brokers:
             - ${KAFKA_BROKER:localhost}
+
+
 security:
   oauth2:
     resource:
@@ -25,3 +27,14 @@ security:
       client-id: mobile
       client-secret: pin
 service.bankaccount: ${BANKACCOUNT_HOST:http://localhost:8083/}
+
+axon:
+  eventhandling:
+    processors:
+        TransactionManagementSagaProcessor:
+          mode: subscribing
+  axonserver:
+    servers: ${AXON_SERVER:"localhost"}
+#        source: eventbus
+
+

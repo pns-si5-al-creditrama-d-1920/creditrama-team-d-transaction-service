@@ -23,14 +23,10 @@ public class NotificationService {
     }
 
     public void sendMail(Transaction transaction) {
-
         MessageChannel messageChannel = notificationStreams.sendTransaction();
-
-         messageChannel.send(MessageBuilder
+        messageChannel.send(MessageBuilder
                 .withPayload(transaction)
                 .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
                 .build());
     }
-
-
 }

@@ -25,6 +25,20 @@
 
 
     <dependencies>
+        <!-- core-api dependency for commands and events -->
+<!--        <dependency>-->
+<!--            <groupId>fr.unice.polytech.si5.al.creditrama.teamd</groupId>-->
+<!--            <artifactId>core-api</artifactId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--        </dependency>-->
+
+        <!-- Axon -->
+        <dependency>
+            <groupId>org.axonframework</groupId>
+            <artifactId>axon-spring-boot-starter</artifactId>
+            <version>4.2.1</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -118,7 +132,18 @@
             <artifactId>feign-httpclient</artifactId>
             <version>10.7.0</version>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <scope>compile</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.0.1</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

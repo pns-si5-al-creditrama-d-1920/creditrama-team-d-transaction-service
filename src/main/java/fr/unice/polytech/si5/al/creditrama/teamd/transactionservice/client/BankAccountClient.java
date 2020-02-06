@@ -15,6 +15,6 @@ public interface BankAccountClient {
     BankAccount getBankAccount(@PathVariable("iban") String iban);
 
     @PatchMapping("/accounts/{iban}")
-    ResponseEntity<BankAccount> updateBanAccount(@PathVariable String iban, @RequestParam double balance);
+    ResponseEntity<BankAccount> updateBankAccount(@PathVariable String iban, @RequestParam double balance);
 
 }
