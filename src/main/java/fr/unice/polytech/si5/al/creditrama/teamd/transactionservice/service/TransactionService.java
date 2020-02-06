@@ -2,7 +2,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ConfirmCodeCommand;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ReceiveTransactionCommand;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.CreateTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
@@ -40,7 +40,8 @@ public class TransactionService {
 
         System.out.println("transaction request " + transactionRequest.toString());
         System.out.println("command gateway : " + commandGateway.toString());
-        return commandGateway.send(new ReceiveTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(), transactionRequest.getAmount()));
+        return commandGateway.send(new CreateTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(),
+                transactionRequest.getAmount(), LocalDateTime.now(), TransactionState.PENDING, (short) (new Random().nextInt(9000) + 1000)));
     }
 
     /* SAGA ADDED */

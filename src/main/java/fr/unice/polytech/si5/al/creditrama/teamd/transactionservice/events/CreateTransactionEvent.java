@@ -8,7 +8,7 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 
 @ToString
-public class TransactionCreatedEvent {
+public class CreateTransactionEvent {
 
     private String uuid;
 
@@ -24,7 +24,7 @@ public class TransactionCreatedEvent {
 
     private short code;
 
-    public TransactionCreatedEvent(String uuid, BankAccount source, BankAccount dest, double amount, LocalDateTime createdTransaction, TransactionState transactionState, short code) {
+    public CreateTransactionEvent(String uuid, BankAccount source, BankAccount dest, double amount, LocalDateTime createdTransaction, TransactionState transactionState, short code) {
         this.uuid = uuid;
         this.source = source;
         this.dest = dest;
