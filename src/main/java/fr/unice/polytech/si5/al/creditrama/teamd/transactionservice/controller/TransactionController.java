@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @CrossOrigin(origins = "*", allowedHeaders = "content-type")
 @RestController
@@ -22,13 +23,10 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions")
-    public ResponseEntity<HttpStatus> createTransaction(@RequestBody TransactionRequest transactionRequest) {
+    public TransactionResponse createTransaction(@RequestBody TransactionRequest transactionRequest) throws ExecutionException, InterruptedException {
         //Transaction transaction = transactionService.makeTransaction(transactionRequest);
-        transactionService.createTransaction(transactionRequest);
-       /* return ResponseEntity.ok(TransactionResponse.builder()
-                .uuid(transaction.getUuid())
-                .code(transaction.getCode() != 0).build());*/
-        return ResponseEntity.ok(HttpStatus.OK);
+        //TODO FIX CODE WORKAROUND
+         return transactionService.createTransaction(transactionRequest);
     }
 
     @PatchMapping("/transactions/{uuid}/code")

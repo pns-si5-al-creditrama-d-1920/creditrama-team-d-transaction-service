@@ -31,8 +31,8 @@ service.bankaccount: ${BANKACCOUNT_HOST:http://localhost:8083/}
 axon:
   eventhandling:
     processors:
-      name:
-        mode: subscribing
+        TransactionManagementSagaProcessor:
+          mode: subscribing
 #        source: eventbus
 
 

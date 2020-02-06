@@ -7,11 +7,14 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAc
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.NotificationService;
 import org.axonframework.commandhandling.CommandHandler;
+import org.axonframework.config.EventProcessingConfigurer;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.spring.stereotype.Aggregate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -22,6 +25,9 @@ import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 @Aggregate
 public class TransactionAggregate {
 
+
+    @Autowired
+    NotificationService notificationService;
     @AggregateIdentifier
     private String uuid;
 
@@ -161,6 +167,7 @@ public class TransactionAggregate {
     protected void on(VerificationCodeNeeded verificationCodeNeeded) {
         System.out.println("Dans @EventHandler on " + verificationCodeNeeded.toString());
         this.uuid = verificationCodeNeeded.getUuid();
+        notificationService.sendMail(verificationCodeNeeded.getTransaction());
         this.transactionState = TransactionState.PENDING;
     }
 
@@ -207,9 +214,10 @@ public class TransactionAggregate {
 
     @SagaEventHandler(associationProperty = "uuid")
     protected void on(CodeConfirmedEvent codeConfirmedEvent) {
-        System.out.println("Dans @EventSourcingHandler on " + codeConfirmedEvent.toString());
+        System.out.println("ConfirmedEvent" + codeConfirmedEvent.toString());
         this.uuid = codeConfirmedEvent.getUuid();
         this.code = codeConfirmedEvent.getCode();
+        apply(new TransactionApprovedEvent(codeConfirmedEvent.getUuid(), codeConfirmedEvent.getTransaction()));
     }
 
     public String getUuid() {

@@ -3,10 +3,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ConfirmCodeCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.CreateTransactionCommand;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.axonframework.commandhandling.gateway.CommandGateway;
@@ -35,13 +32,14 @@ public class TransactionService {
     }
 
     /* SAGA ADDED */
-    public CompletableFuture<String> createTransaction(TransactionRequest transactionRequest) {
+    public TransactionResponse createTransaction(TransactionRequest transactionRequest) {
         String uuid = UUID.randomUUID().toString();
-
+        //TODO FIX CODE WORKAROUND
         System.out.println("transaction request " + transactionRequest.toString());
         System.out.println("command gateway : " + commandGateway.toString());
-        return commandGateway.send(new CreateTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(),
-                transactionRequest.getAmount(), LocalDateTime.now(), TransactionState.PENDING, (short) (new Random().nextInt(9000) + 1000)));
+         commandGateway.send(new CreateTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(),
+                transactionRequest.getAmount(), LocalDateTime.now(), TransactionState.PENDING, (short)(new Random().nextInt(9000) + 1000)));
+        return new TransactionResponse(uuid, transactionRequest.getAmount()>=10);
     }
 
     /* SAGA ADDED */
