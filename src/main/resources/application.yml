@@ -33,6 +33,8 @@ axon:
     processors:
         TransactionManagementSagaProcessor:
           mode: subscribing
+  axonserver:
+    servers: ${AXON_SERVER:"localhost"}
 #        source: eventbus
 
 
