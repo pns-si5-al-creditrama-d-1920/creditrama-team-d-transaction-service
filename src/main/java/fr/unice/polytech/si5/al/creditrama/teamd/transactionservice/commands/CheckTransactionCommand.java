@@ -4,15 +4,20 @@ import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @ToString
-public class StoreTransactionCommand {
-    @TargetAggregateIdentifier
-    private final String uuid;
+public class CheckTransactionCommand {
 
-    public StoreTransactionCommand(String uuid) {
+    @TargetAggregateIdentifier
+    private String uuid;
+
+    public CheckTransactionCommand(String uuid) {
         this.uuid = uuid;
     }
 
     public String getUuid() {
         return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

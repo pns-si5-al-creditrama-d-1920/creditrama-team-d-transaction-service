@@ -1,27 +1,17 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
-import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-@ToString
-public class TransactionValidityCheckCommand {
+public class ReverseTransferCommand {
 
     @TargetAggregateIdentifier
     private String uuid;
 
     private Transaction transaction;
 
-    public TransactionValidityCheckCommand(String uuid, Transaction transaction) {
-        this.transaction = transaction;
+    public ReverseTransferCommand(String uuid, Transaction transaction) {
         this.uuid = uuid;
-    }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
 
@@ -31,5 +21,13 @@ public class TransactionValidityCheckCommand {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 }

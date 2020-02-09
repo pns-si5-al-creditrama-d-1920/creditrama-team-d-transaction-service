@@ -5,24 +5,15 @@ import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 @ToString
-public class UpdateBankAccountCommand {
+public class MakeTransferCommand {
 
     @TargetAggregateIdentifier
     private String uuid;
 
     private Transaction transaction;
 
-
-    public UpdateBankAccountCommand(String uuid, Transaction transaction) {
-        this.transaction = transaction;
+    public MakeTransferCommand(String uuid, Transaction transaction) {
         this.uuid = uuid;
-    }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
 
@@ -32,5 +23,13 @@ public class UpdateBankAccountCommand {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 }

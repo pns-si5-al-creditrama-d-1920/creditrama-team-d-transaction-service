@@ -2,20 +2,12 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 
-public class UpdatedBankAccountEvent {
+public class TransactionCheckedEvent {
     private String uuid;
     private Transaction transaction;
 
-    public UpdatedBankAccountEvent(String uuid, Transaction transaction) {
+    public TransactionCheckedEvent(String uuid, Transaction transaction) {
         this.uuid = uuid;
-        this.transaction = transaction;
-    }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
 
@@ -25,5 +17,13 @@ public class UpdatedBankAccountEvent {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 }

@@ -2,18 +2,13 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 
-public class CodeConfirmedEvent {
-
+public class TransferDoneEvent {
     private String uuid;
-
     private Transaction transaction;
 
-    private short code;
-
-    public CodeConfirmedEvent(String uuid, Transaction transaction, short code) {
+    public TransferDoneEvent(String uuid, Transaction transaction) {
         this.uuid = uuid;
         this.transaction = transaction;
-        this.code = code;
     }
 
     public String getUuid() {
@@ -30,13 +25,5 @@ public class CodeConfirmedEvent {
 
     public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
-    }
-
-    public short getCode() {
-        return code;
-    }
-
-    public void setCode(short code) {
-        this.code = code;
     }
 }
