@@ -20,7 +20,6 @@ env:
   BANKACCOUNT_HOST: "http://creditrama-team-d-bankaccount-service-al-team-d.apps.jboss.team"
   BANKACCOUNT_PORT: "8080"
   AXON_SERVER: "axonserver.al-team-d.svc"
-
 # enable this flag to use knative serve to deploy the app
 knativeDeploy: false
 

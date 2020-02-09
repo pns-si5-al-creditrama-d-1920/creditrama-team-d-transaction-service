@@ -7,17 +7,13 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAc
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.NotificationService;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.ErrorService;
 import org.axonframework.commandhandling.CommandHandler;
-import org.axonframework.config.EventProcessingConfigurer;
-import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Random;
 
 import static org.axonframework.modelling.command.AggregateLifecycle.apply;
@@ -25,9 +21,6 @@ import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 @Aggregate
 public class TransactionAggregate {
 
-
-    @Autowired
-    NotificationService notificationService;
     @AggregateIdentifier
     private String uuid;
 
@@ -45,206 +38,130 @@ public class TransactionAggregate {
 
     private boolean errorOn;
     private int errorRate;
+    private String bankUuid;
 
     public TransactionAggregate() {
-        // Required by Axon to build a default Aggregate prior to Event Sourcing
-        System.out.println("Dans TransactionRequestAggregate le constructor vide");
         this.errorOn = true;
         this.errorRate = 5;
     }
 
-    /* The @CommandHandler annotated functions are the place where you would put your decision-making/business logic.  */
     @CommandHandler
-    public TransactionAggregate(CreateTransactionCommand createTransactionCommand, BankAccountClient bankAccountClient) {
+    public TransactionAggregate(CreateTransactionCommand createTransactionCommand, BankAccountClient bankAccountClient, TransactionRepository transactionRepository) {
         System.out.println("Dans @CommandHandler CreateTransactionCommand " + createTransactionCommand.toString());
 
-        BankAccount bankAccountSrc = bankAccountClient.getBankAccount(createTransactionCommand.getSource());
+        BankAccount bankAccountSrc = bankAccountClient.getBankAccount(createTransactionCommand.getSourceAccount());
         BankAccount bankAccountDst = bankAccountClient.getBankAccount(createTransactionCommand.getDest());
 
-        apply(new CreateTransactionEvent(createTransactionCommand.getUuid(), bankAccountSrc,
-                bankAccountDst, createTransactionCommand.getAmount(), createTransactionCommand.getCreatedTransaction(),
-                createTransactionCommand.getTransactionState(), createTransactionCommand.getCode()));
+        Transaction transaction = new Transaction(createTransactionCommand.getUuid(), bankAccountSrc, bankAccountDst, createTransactionCommand.getAmount(),
+                createTransactionCommand.getCreatedTransaction(), createTransactionCommand.getTransactionState(), createTransactionCommand.getCode());
+
+        if (bankAccountSrc != null && bankAccountDst != null) {
+            transactionRepository.save(transaction);
+            apply(new CreateTransactionEvent(transaction.getUuid(), transaction));
+        } else {
+            apply(new TransactionRejectedEvent(transaction.getUuid(), transaction));
+        }
     }
 
-    /* As all the Event Sourcing Handlers combined will form the Aggregate, this is where all the state changes happen. */
     @SagaEventHandler(associationProperty = "uuid")
     protected void on(CreateTransactionEvent createTransactionEvent) {
         System.out.println("Dans @EventHandler on " + createTransactionEvent.toString());
-        this.uuid = createTransactionEvent.getUuid();
-        this.sourceAccount = createTransactionEvent.getSource();
-        this.destAccount = createTransactionEvent.getDest();
-        this.amount = createTransactionEvent.getAmount();
-        this.createdTransaction = createTransactionEvent.getCreatedTransaction();
-        this.transactionState = createTransactionEvent.getTransactionState();
-        this.code = createTransactionEvent.getCode();
+        Transaction transaction = createTransactionEvent.getTransaction();
+        this.uuid = transaction.getUuid();
+        this.sourceAccount = transaction.getSource();
+        this.destAccount = transaction.getDest();
+        this.amount = transaction.getAmount();
+        this.createdTransaction = transaction.getCreatedTransaction();
+        this.transactionState = transaction.getTransactionState();
+        this.code = transaction.getCode();
+
     }
 
     @CommandHandler
-    public void on(TransactionValidityCheckCommand transactionValidityCheckCommand) {
-        System.out.println("Dans @CommandHandler TransactionValidityCheckCommand " + transactionValidityCheckCommand.toString());
-        Transaction transaction = transactionValidityCheckCommand.getTransaction();
+    public void checkTransaction(CheckTransactionCommand checkTransactionCommand) {
+        System.out.println("Dans @CommandHandler CheckTransactionCommand " + checkTransactionCommand.toString());
 
-        // check that source account has enough money for the transaction
-        BankAccount bankAccountSrc = transaction.getSource();
-        BankAccount bankAccountDst = transaction.getDest();
+        Transaction transaction = buildTransaction();
 
-        if (bankAccountSrc == null || bankAccountDst == null) {
-            apply(new TransactionRejectedEvent(transactionValidityCheckCommand.getUuid(), transactionValidityCheckCommand.getTransaction()));
-        } else if (bankAccountSrc.getBalance() < transaction.getAmount()) {
-            apply(new TransactionRejectedEvent(transactionValidityCheckCommand.getUuid(), transactionValidityCheckCommand.getTransaction()));
+        if (this.sourceAccount == null || this.destAccount == null || this.sourceAccount.getBalance() < this.amount) {
+            apply(new TransactionRejectedEvent(transaction.getUuid(), transaction));
         } else {
-            apply(new TransactionValidityCheckedEvent(transactionValidityCheckCommand.getUuid(), transaction));
+            apply(new TransactionCheckedEvent(transaction.getUuid(), transaction));
         }
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     protected void on(TransactionRejectedEvent transactionRejectedEvent) {
         System.out.println("Dans @EventHandler on " + transactionRejectedEvent.toString());
-        this.uuid = transactionRejectedEvent.getUuid();
+        this.uuid = transactionRejectedEvent.getTransaction().getUuid();
         this.transactionState = TransactionState.CANCEL;
     }
 
-    @SagaEventHandler(associationProperty = "uuid")
-    protected void on(TransactionValidityCheckedEvent transactionValidityCheckedEvent) {
-        System.out.println("Dans @EventHandler on " + transactionValidityCheckedEvent.toString());
-        this.uuid = transactionValidityCheckedEvent.getUuid();
-        //FIXME really need that ? what to de here ?
-        this.transactionState = TransactionState.ACCEPTED;
-    }
-
     @CommandHandler
-    public void updateBankAccount(UpdateBankAccountCommand updateBankAccountCommand, BankAccountClient bankAccountClient) {
-        System.out.println("Dans @CommandHandler UpdateBankAccountAggregate " + updateBankAccountCommand.toString());
-        Transaction transaction = updateBankAccountCommand.getTransaction();
-
-        try {
-            bankAccountClient.updateBankAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() - transaction.getAmount());
-            bankAccountClient.updateBankAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() + transaction.getAmount());
-
-            apply(new UpdatedBankAccountEvent(updateBankAccountCommand.getUuid(), transaction));
-        } catch (Exception e) {
-            apply(new TransactionRejectedEvent(updateBankAccountCommand.getUuid(), transaction));
-        }
-    }
-
-    @EventHandler
-    protected void on(UpdatedBankAccountEvent updatedBankAccountEvent) {
-        this.uuid = updatedBankAccountEvent.getUuid();
-        this.destAccount = updatedBankAccountEvent.getTransaction().getDest();
-        this.sourceAccount = updatedBankAccountEvent.getTransaction().getSource();
-    }
-
-    @CommandHandler
-    public void on(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) {
+    public void storeTransaction(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) {
         System.out.println("Dans @CommandHandler StoreTransactionCommand " + storeTransactionCommand.toString());
-        Transaction transaction = storeTransactionCommand.getTransaction();
-        this.errorOn = false;
+        Transaction transaction = buildTransaction();
+        this.bankUuid = storeTransactionCommand.getBankUuid();
 
         //save transaction
         transactionRepository.save(transaction);
 
-        //FIXME 2 else needed ?
-        //there was an error
-        if (this.errorOn) {
+        //error service used to toggle database writing errors
+        ErrorService errorService = new ErrorService();
+
+        if (errorService.isErrorsOn()) {
+            //there was an error
             Random random = new Random();
-            // int randomNumber = random.nextInt(100) + 1;
-           /* if (randomNumber <= this.errorRate) {
-                // throw new DatabaseWriteException("Error due to our fixed rate");
-                apply(new TransactionStorageCancelledEvent(storeTransactionCommand.getUuid(), transaction));
-            } else {*/
-            apply(new TransactionStorageCancelledEvent(storeTransactionCommand.getUuid(), transaction));
-            //           }
-        } else {
-            if (storeTransactionCommand.getTransaction().getAmount() >= 10.0) {
-                apply(new VerificationCodeNeeded(storeTransactionCommand.getUuid(), transaction));
+            int randomNumber = random.nextInt(100) + 1;
+            if (randomNumber <= errorService.getErrorRate()) {
+                apply(new TransferCancelledEvent(storeTransactionCommand.getBankUuid(), transaction));
+                //throw new DatabaseWriteException("Error due to our fixed rate");
             } else {
-                apply(new TransactionApprovedEvent(storeTransactionCommand.getUuid(), transaction));
+                if (transaction.getAmount() >= 10.0) {
+                    apply(new VerificationCodeNeeded(transaction.getUuid()));
+                } else {
+                    apply(new TransactionApprovedEvent(transaction.getUuid(), transaction));
+                }
+            }
+        } else {
+            if (transaction.getAmount() >= 10.0) {
+                apply(new VerificationCodeNeeded(transaction.getUuid()));
+            } else {
+                apply(new TransactionApprovedEvent(transaction.getUuid(), transaction));
             }
         }
     }
 
     @SagaEventHandler(associationProperty = "uuid")
-    protected void on(VerificationCodeNeeded verificationCodeNeeded) {
-        System.out.println("Dans @EventHandler on " + verificationCodeNeeded.toString());
-        this.uuid = verificationCodeNeeded.getUuid();
-        notificationService.sendMail(verificationCodeNeeded.getTransaction());
-        this.transactionState = TransactionState.PENDING;
-    }
-
-    @SagaEventHandler(associationProperty = "uuid")
-    protected void on(TransactionStorageCancelledEvent transactionStorageCancelledEvent) {
-        System.out.println("Dans @EventHandler on " + transactionStorageCancelledEvent.toString());
-        this.uuid = transactionStorageCancelledEvent.getUuid();
-        this.transactionState = TransactionState.CANCEL;
-    }
-
-    @SagaEventHandler(associationProperty = "uuid")
     protected void on(TransactionApprovedEvent transactionApprovedEvent) {
         System.out.println("Dans @EventHandler on " + transactionApprovedEvent.toString());
-        this.uuid = transactionApprovedEvent.getUuid();
         this.transactionState = TransactionState.ACCEPTED;
     }
 
     @CommandHandler
-    public void on(CancelTransactionStorageCommand cancelTransactionStorageCommand, BankAccountClient bankAccountClient) {
-        System.out.println("Dans @CommandHandler CancelTransactionStorageCommand " + cancelTransactionStorageCommand.toString());
-        Transaction transaction = cancelTransactionStorageCommand.getTransaction();
+    public void confirmCode(ConfirmCodeCommand confirmCodeCommand) {
+        System.out.println("Dans @CommandHandler ConfirmCodeCommand " + confirmCodeCommand.toString());
+        Transaction transaction = buildTransaction();
 
-        //compensiate accounts
-        bankAccountClient.updateBankAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() + transaction.getAmount());
-        bankAccountClient.updateBankAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() - transaction.getAmount());
-
-        apply(new TransactionRejectedEvent(cancelTransactionStorageCommand.getUuid(), transaction));
+        if (this.code != confirmCodeCommand.getCode()) {
+            //FIXME improve this
+            apply(new TransferCancelledEvent(this.bankUuid, transaction));
+        } else {
+            //FIXME à quoi ça sert ça ?
+            // transaction.setCode((short) 0);
+            // transactionRepository.save(transaction);
+            apply(new TransactionApprovedEvent(transaction.getUuid(), transaction));
+        }
     }
+
+    private Transaction buildTransaction() {
+        return new Transaction(this.uuid, this.sourceAccount, this.destAccount, this.amount, this.createdTransaction, this.transactionState, this.code);
+    }
+
 
     @CommandHandler
-    public void on(ConfirmCodeCommand confirmCodeCommand, TransactionRepository transactionRepository) {
-        System.out.println("Dans @CommandHandler ConfirmCodeCommand " + confirmCodeCommand.toString());
-
-        Optional<Transaction> transactionOpt = transactionRepository.findById(confirmCodeCommand.getUuid());
-        if (!transactionOpt.isPresent() || transactionOpt.get().getCode() != code) {
-            apply(new TransactionRejectedEvent(confirmCodeCommand.getUuid(), transactionOpt.get()));
-        }
-        Transaction transaction = transactionOpt.get();
-        transaction.setCode((short) 0);
-        transactionRepository.save(transaction);
-
-        apply(new CodeConfirmedEvent(confirmCodeCommand.getUuid(), transactionOpt.get(), confirmCodeCommand.getCode()));
-    }
-
-    @SagaEventHandler(associationProperty = "uuid")
-    protected void on(CodeConfirmedEvent codeConfirmedEvent) {
-        System.out.println("ConfirmedEvent" + codeConfirmedEvent.toString());
-        this.uuid = codeConfirmedEvent.getUuid();
-        this.code = codeConfirmedEvent.getCode();
-        apply(new TransactionApprovedEvent(codeConfirmedEvent.getUuid(), codeConfirmedEvent.getTransaction()));
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public BankAccount getSourceAccount() {
-        return sourceAccount;
-    }
-
-    public BankAccount getDestAccount() {
-        return destAccount;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public LocalDateTime getCreatedTransaction() {
-        return createdTransaction;
-    }
-
-    public TransactionState getTransactionState() {
-        return transactionState;
-    }
-
-    public short getCode() {
-        return code;
+    public void rejectTransaction(RejectTransactionCommand rejectTransactionCommand) {
+        System.out.println("Dans @CommandHandler RejectTransactionCommand " + rejectTransactionCommand.toString());
+        apply(new TransactionRejectedEvent(rejectTransactionCommand.getUuid(), rejectTransactionCommand.getTransaction()));
     }
 }

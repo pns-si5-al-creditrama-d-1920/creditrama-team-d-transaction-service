@@ -2,21 +2,21 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 
-public class TransactionRejectedEvent {
-    private String uuid;
+public class TransferCancelledEvent {
+    private String bankUuid;
     private Transaction transaction;
 
-    public TransactionRejectedEvent(String uuid,  Transaction transaction) {
-        this.uuid = uuid;
+    public TransferCancelledEvent(String bankUuid, Transaction transaction) {
+        this.bankUuid = bankUuid;
         this.transaction = transaction;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getBankUuid() {
+        return bankUuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setBankUuid(String bankUuid) {
+        this.bankUuid = bankUuid;
     }
 
     public Transaction getTransaction() {

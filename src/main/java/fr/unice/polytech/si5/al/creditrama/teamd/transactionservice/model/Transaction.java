@@ -24,7 +24,6 @@ public class Transaction {
 
     private double amount;
 
-    @CreatedDate
     private LocalDateTime createdTransaction;
 
     private TransactionState transactionState;

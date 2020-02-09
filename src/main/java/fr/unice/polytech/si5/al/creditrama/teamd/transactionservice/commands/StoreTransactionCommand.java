@@ -1,6 +1,5 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
 
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
@@ -9,19 +8,19 @@ public class StoreTransactionCommand {
     @TargetAggregateIdentifier
     private final String uuid;
 
-    private Transaction transaction;
+    private String bankUuid;
 
-    public StoreTransactionCommand(String uuid, Transaction transaction) {
-        this.transaction = transaction;
+    public StoreTransactionCommand(String uuid, String bankUuid) {
         this.uuid = uuid;
+        this.bankUuid = bankUuid;
     }
 
-    public Transaction getTransaction() {
-        return transaction;
+    public String getBankUuid() {
+        return bankUuid;
     }
 
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
+    public void setBankUuid(String bankUuid) {
+        this.bankUuid = bankUuid;
     }
 
     public String getUuid() {

@@ -38,7 +38,7 @@ public class CreateTransactionCommand {
         return uuid;
     }
 
-    public String getSource() {
+    public String getSourceAccount() {
         return sourceAccount;
     }
 

@@ -2,11 +2,11 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 
-public class TransactionRejectedEvent {
+public class TransactionCheckedEvent {
     private String uuid;
     private Transaction transaction;
 
-    public TransactionRejectedEvent(String uuid,  Transaction transaction) {
+    public TransactionCheckedEvent(String uuid, Transaction transaction) {
         this.uuid = uuid;
         this.transaction = transaction;
     }
