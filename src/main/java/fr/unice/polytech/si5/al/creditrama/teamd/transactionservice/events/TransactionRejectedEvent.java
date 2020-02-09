@@ -6,7 +6,7 @@ public class TransactionRejectedEvent {
     private String uuid;
     private Transaction transaction;
 
-    public TransactionRejectedEvent(String uuid, Transaction transaction) {
+    public TransactionRejectedEvent(String uuid,  Transaction transaction) {
         this.uuid = uuid;
         this.transaction = transaction;
     }

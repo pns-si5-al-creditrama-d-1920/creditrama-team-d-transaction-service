@@ -8,8 +8,19 @@ public class StoreTransactionCommand {
     @TargetAggregateIdentifier
     private final String uuid;
 
-    public StoreTransactionCommand(String uuid) {
+    private String bankUuid;
+
+    public StoreTransactionCommand(String uuid, String bankUuid) {
         this.uuid = uuid;
+        this.bankUuid = bankUuid;
+    }
+
+    public String getBankUuid() {
+        return bankUuid;
+    }
+
+    public void setBankUuid(String bankUuid) {
+        this.bankUuid = bankUuid;
     }
 
     public String getUuid() {

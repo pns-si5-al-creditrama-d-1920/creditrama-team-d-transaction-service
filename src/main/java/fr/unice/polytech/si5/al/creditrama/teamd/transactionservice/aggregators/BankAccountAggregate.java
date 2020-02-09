@@ -4,6 +4,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankA
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.MakeTransferCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.ReverseTransferCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransactionRejectedEvent;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransferCancelledEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransferDoneEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.TransferReversedEvent;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
@@ -25,17 +26,17 @@ public class BankAccountAggregate {
     }
 
     @CommandHandler
-    public void makeTransfer(MakeTransferCommand makeTransferCommand, BankAccountClient bankAccountClient) {
+    public BankAccountAggregate(MakeTransferCommand makeTransferCommand, BankAccountClient bankAccountClient) {
         System.out.println("Dans @CommandHandler MakeTransferCommand " + makeTransferCommand.toString());
         Transaction transaction = makeTransferCommand.getTransaction();
         try {
             bankAccountClient.updateBankAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() - transaction.getAmount());
             bankAccountClient.updateBankAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() + transaction.getAmount());
 
-            apply(new TransferDoneEvent(transaction.getUuid(), transaction));
+            apply(new TransferDoneEvent(makeTransferCommand.getBankUuid(), transaction));
         } catch (Exception e) {
             //FIXME reverse transfer ?
-            apply(new TransactionRejectedEvent(transaction.getUuid(), transaction));
+            apply(new TransactionRejectedEvent(makeTransferCommand.getUuid(), transaction));
         }
     }
 
@@ -55,9 +56,9 @@ public class BankAccountAggregate {
             bankAccountClient.updateBankAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() + transaction.getAmount());
             bankAccountClient.updateBankAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() - transaction.getAmount());
 
-            apply(new TransferReversedEvent(transaction.getUuid(), transaction));
+            apply(new TransferReversedEvent(reverseTransferCommand.getBankUuid(), transaction));
         } catch (Exception e) {
-            apply(new TransactionRejectedEvent(transaction.getUuid(), transaction));
+            apply(new TransactionRejectedEvent(reverseTransferCommand.getUuid(), transaction));
         }
     }
 
@@ -67,12 +68,5 @@ public class BankAccountAggregate {
         System.out.println("Dans @EventHandler on " + transferReversedEvent.toString());
         this.transaction = transferReversedEvent.getTransaction();
         this.bankUuid = transferReversedEvent.getBankUuid();
-    }
-
-    @SagaEventHandler(associationProperty = "bankUuid")
-    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
-        System.out.println("Dans @EventHandler on " + transactionRejectedEvent.toString());
-        this.bankUuid = transactionRejectedEvent.getUuid();
-        this.transaction = transactionRejectedEvent.getTransaction();
     }
 }

@@ -9,12 +9,21 @@ public class MakeTransferCommand {
 
     @TargetAggregateIdentifier
     private String bankUuid;
-
+    private String uuid;
     private Transaction transaction;
 
-    public MakeTransferCommand(String uuid, Transaction transaction) {
-        this.bankUuid = uuid;
+    public MakeTransferCommand(String bankUuid, String uuid, Transaction transaction) {
+        this.bankUuid = bankUuid;
+        this.uuid = uuid;
         this.transaction = transaction;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getBankUuid() {

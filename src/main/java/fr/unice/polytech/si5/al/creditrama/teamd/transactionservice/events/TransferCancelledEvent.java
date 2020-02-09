@@ -1,27 +1,14 @@
-package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
+package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
-import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
-public class ReverseTransferCommand {
-
-    @TargetAggregateIdentifier
+public class TransferCancelledEvent {
     private String bankUuid;
-    private String uuid;
     private Transaction transaction;
 
-    public ReverseTransferCommand(String bankUuid, String uuid, Transaction transaction) {
+    public TransferCancelledEvent(String bankUuid, Transaction transaction) {
         this.bankUuid = bankUuid;
-        this.uuid = uuid;
         this.transaction = transaction;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
     public String getBankUuid() {

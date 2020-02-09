@@ -7,7 +7,6 @@ public class ErrorService {
     private static boolean error = false;
     private static int errorRate = 0;
 
-
     public boolean isErrorsOn() {
         return error;
     }

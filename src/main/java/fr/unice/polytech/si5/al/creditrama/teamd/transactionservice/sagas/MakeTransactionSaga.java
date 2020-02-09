@@ -40,7 +40,7 @@ public class MakeTransactionSaga {
         System.out.println("Saga invoked TransactionCheckedEvent");
         String bankUuid = UUID.randomUUID().toString();
         SagaLifecycle.associateWith("bankUuid", bankUuid);
-        commandGateway.send(new MakeTransferCommand(transactionCheckedEvent.getTransaction().getUuid(), transactionCheckedEvent.getTransaction()));
+        commandGateway.send(new MakeTransferCommand(bankUuid, transactionCheckedEvent.getUuid(), transactionCheckedEvent.getTransaction()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -52,15 +52,20 @@ public class MakeTransactionSaga {
     @SagaEventHandler(associationProperty = "bankUuid")
     public void handle(TransferDoneEvent transferDoneEvent) {
         System.out.println("Saga invoked TransferDoneEvent");
-        commandGateway.send(new StoreTransactionCommand(transferDoneEvent.getTransaction().getUuid()));
+        commandGateway.send(new StoreTransactionCommand(transferDoneEvent.getTransaction().getUuid(), transferDoneEvent.getBankUuid()));
     }
 
     @SagaEventHandler(associationProperty = "bankUuid")
     public void handle(TransferReversedEvent transferReversedEvent) {
         System.out.println("Saga invoked TransferReversedEvent");
-        Transaction transaction = transferReversedEvent.getTransaction();
-        transaction.setTransactionState(TransactionState.ACCEPTED);
-        transactionRepository.save(transaction);
+        commandGateway.send(new RejectTransactionCommand(transferReversedEvent.getTransaction().getUuid(), transferReversedEvent.getTransaction()));
+
+    }
+
+    @SagaEventHandler(associationProperty = "bankUuid")
+    public void handle(TransferCancelledEvent transferCancelledEvent) {
+        System.out.println("Saga invoked TransferCancelledEvent");
+        commandGateway.send(new ReverseTransferCommand(transferCancelledEvent.getBankUuid(), transferCancelledEvent.getTransaction().getUuid(), transferCancelledEvent.getTransaction()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -84,8 +89,4 @@ public class MakeTransactionSaga {
 
         transactionRepository.save(transaction);
     }
-
-
-
-
 }
