@@ -2,20 +2,12 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 
-public class TransactionStorageCancelledEvent {
+public class TransferReversedEvent {
     private String uuid;
     private Transaction transaction;
 
-    public TransactionStorageCancelledEvent(String uuid, Transaction transaction) {
+    public TransferReversedEvent(String uuid, Transaction transaction) {
         this.uuid = uuid;
-        this.transaction = transaction;
-    }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
         this.transaction = transaction;
     }
 
@@ -25,5 +17,13 @@ public class TransactionStorageCancelledEvent {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 }

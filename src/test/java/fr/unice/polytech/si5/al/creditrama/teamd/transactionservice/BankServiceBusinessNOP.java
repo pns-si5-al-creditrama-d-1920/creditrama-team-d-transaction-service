@@ -1,4 +1,4 @@
-package fr.unice.polytech.si5.al.creditrama.teamd.bankaccount;
+package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.TransactionService;
 import org.junit.Before;
@@ -19,15 +19,12 @@ public class BankServiceBusinessNOP {
     @Autowired
     private TransactionService business;
 
-
     @Before
     public void setUp() {
-        /**
-         Client client = new Client(null, "nathan", "password", "n@gmail.com", true, true, true, true, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-         client = clientService.save(client);
-         clientId = client.getUserId();
-         bankAccountId = client.getBankAccounts().get(0).getAccountNumber();
-         **/
+   /*   Client client = new Client(null, "nathan", "password", "n@gmail.com", true, true, true, true, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+      client = clientService.save(client);
+      clientId = client.getUserId();
+      bankAccountId = client.getBankAccounts().get(0).getAccountNumber();*/
     }
 
     @Test

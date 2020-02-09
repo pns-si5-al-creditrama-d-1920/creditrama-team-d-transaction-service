@@ -5,7 +5,6 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
-import org.axonframework.eventhandling.DisallowReplay;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.StartSaga;
@@ -15,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 //TODO investiguer sur les SAGA stores
 // NOTE : si 2 fois le même aggregate identifier à la même value : error, explications :
 // https://medium.com/@gushakov/discovering-cqrs-and-event-sourcing-with-axon-framework-afb3782e39c7
-
+/*
 @Saga
 public class TransactionManagementSaga {
 
@@ -27,31 +26,29 @@ public class TransactionManagementSaga {
 
     public TransactionManagementSaga() {
     }
-
+/*
     //TODO create custom exceptions
     @StartSaga
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(CreateTransactionEvent createTransactionEvent) {
-        System.out.println("Saga invoked TransactionCreatedEvent" + createTransactionEvent.getUuid());
+        System.out.println("Saga invoked TransactionCreatedEvent" + createTransactionEvent.toString());
         Transaction transaction = createTransactionEvent.getTransaction();
 
-        commandGateway.send(new TransactionValidityCheckCommand(transaction.getUuid(), transaction));
+        commandGateway.send(new CheckTransactionCommand(transaction.getUuid(), transaction));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
-    public void handle(TransactionValidityCheckedEvent transactionValidityCheckedEvent) {
+    public void handle(TransactionCheckedEvent transactionCheckedEvent) {
         System.out.println("Saga invoked TransactionValidityCheckedEvent");
-        Transaction transaction = transactionValidityCheckedEvent.getTransaction();
-
-        commandGateway.send(new UpdateBankAccountCommand(transaction.getUuid(), transaction));
+        commandGateway.send(new MakeTransferCommand(transactionCheckedEvent.getUuid(), transactionCheckedEvent.getSource(),
+                transactionCheckedEvent.getDest(), transactionCheckedEvent.getAmount()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
-    public void handle(UpdatedBankAccountEvent updatedBankAccountEvent) {
+    public void handle(TransferDoneEvent transferDoneEvent) {
         System.out.println("Saga invoked UpdatedBankAccountEvent");
-        Transaction transaction = updatedBankAccountEvent.getTransaction();
 
-        commandGateway.send(new StoreTransactionCommand(transaction.getUuid(), transaction));
+        commandGateway.send(new StoreTransactionCommand(transferDoneEvent.));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -100,3 +97,4 @@ public class TransactionManagementSaga {
         //commandGateway.send(new RejectTransactionCommand(uuid, transactionRejectedEvent.getTransaction()));
     }
 }
+*/
