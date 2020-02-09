@@ -18,7 +18,7 @@ import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 public class BankAccountAggregate {
 
     @AggregateIdentifier
-    private String uuid;
+    private String bankUuid;
     private Transaction transaction;
 
     public BankAccountAggregate() {
@@ -28,7 +28,6 @@ public class BankAccountAggregate {
     public void makeTransfer(MakeTransferCommand makeTransferCommand, BankAccountClient bankAccountClient) {
         System.out.println("Dans @CommandHandler MakeTransferCommand " + makeTransferCommand.toString());
         Transaction transaction = makeTransferCommand.getTransaction();
-
         try {
             bankAccountClient.updateBankAccount(transaction.getSource().getIban(), transaction.getSource().getBalance() - transaction.getAmount());
             bankAccountClient.updateBankAccount(transaction.getDest().getIban(), transaction.getDest().getBalance() + transaction.getAmount());
@@ -40,10 +39,11 @@ public class BankAccountAggregate {
         }
     }
 
-    @SagaEventHandler(associationProperty = "uuid")
+    @SagaEventHandler(associationProperty = "bankUuid")
     protected void on(TransferDoneEvent transferDoneEvent) {
         System.out.println("Dans @EventHandler on " + transferDoneEvent.toString());
         this.transaction = transferDoneEvent.getTransaction();
+        this.bankUuid = transferDoneEvent.getBankUuid();
     }
 
     @CommandHandler
@@ -62,9 +62,17 @@ public class BankAccountAggregate {
     }
 
     //TODO vraiment besoin de ça ?
-    @SagaEventHandler(associationProperty = "uuid")
+    @SagaEventHandler(associationProperty = "bankUuid")
     protected void on(TransferReversedEvent transferReversedEvent) {
         System.out.println("Dans @EventHandler on " + transferReversedEvent.toString());
         this.transaction = transferReversedEvent.getTransaction();
+        this.bankUuid = transferReversedEvent.getBankUuid();
+    }
+
+    @SagaEventHandler(associationProperty = "bankUuid")
+    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
+        System.out.println("Dans @EventHandler on " + transactionRejectedEvent.toString());
+        this.bankUuid = transactionRejectedEvent.getUuid();
+        this.transaction = transactionRejectedEvent.getTransaction();
     }
 }

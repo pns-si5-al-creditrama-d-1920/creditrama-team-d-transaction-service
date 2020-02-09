@@ -77,6 +77,7 @@ public class TransactionAggregate {
         this.createdTransaction = transaction.getCreatedTransaction();
         this.transactionState = transaction.getTransactionState();
         this.code = transaction.getCode();
+
     }
 
     @CommandHandler

@@ -8,9 +8,12 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.T
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
+import org.axonframework.modelling.saga.SagaLifecycle;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Saga;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.UUID;
 
 @Saga
 public class MakeTransactionSaga {
@@ -35,13 +38,9 @@ public class MakeTransactionSaga {
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionCheckedEvent transactionCheckedEvent) {
         System.out.println("Saga invoked TransactionCheckedEvent");
+        String bankUuid = UUID.randomUUID().toString();
+        SagaLifecycle.associateWith("bankUuid", bankUuid);
         commandGateway.send(new MakeTransferCommand(transactionCheckedEvent.getTransaction().getUuid(), transactionCheckedEvent.getTransaction()));
-    }
-
-    @SagaEventHandler(associationProperty = "uuid")
-    public void handle(TransferDoneEvent transferDoneEvent) {
-        System.out.println("Saga invoked TransferDoneEvent");
-        commandGateway.send(new StoreTransactionCommand(transferDoneEvent.getTransaction().getUuid()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -50,13 +49,17 @@ public class MakeTransactionSaga {
         System.out.println("Waiting for verification code...");
     }
 
-    @SagaEventHandler(associationProperty = "uuid")
+    @SagaEventHandler(associationProperty = "bankUuid")
+    public void handle(TransferDoneEvent transferDoneEvent) {
+        System.out.println("Saga invoked TransferDoneEvent");
+        commandGateway.send(new StoreTransactionCommand(transferDoneEvent.getTransaction().getUuid()));
+    }
+
+    @SagaEventHandler(associationProperty = "bankUuid")
     public void handle(TransferReversedEvent transferReversedEvent) {
         System.out.println("Saga invoked TransferReversedEvent");
-
         Transaction transaction = transferReversedEvent.getTransaction();
         transaction.setTransactionState(TransactionState.ACCEPTED);
-
         transactionRepository.save(transaction);
     }
 
@@ -81,4 +84,8 @@ public class MakeTransactionSaga {
 
         transactionRepository.save(transaction);
     }
+
+
+
+
 }
