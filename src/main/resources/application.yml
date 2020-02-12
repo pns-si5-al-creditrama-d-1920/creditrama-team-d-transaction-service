@@ -26,14 +26,17 @@ security:
     client:
       client-id: mobile
       client-secret: pin
+
 service.bankaccount: ${BANKACCOUNT_HOST:http://localhost:8083/}
 
 axon:
   eventhandling:
     processors:
-        MakeTransactionSagaProcessor:
-          mode: subscribing
+      MakeTransactionSagaProcessor:
+        mode: subscribing
   axonserver:
     servers: ${AXON_SERVER:localhost}
+    client-id: transaction-service
+    component-name: transaction-service
 
 
