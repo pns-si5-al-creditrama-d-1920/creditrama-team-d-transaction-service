@@ -1,8 +1,8 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.aggregators;
 
+import fr.unice.polytech.si5.al.creditrama.teamd.coreapi.commands.*;
+import fr.unice.polytech.si5.al.creditrama.teamd.coreapi.events.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.*;
-import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
@@ -36,13 +36,9 @@ public class TransactionAggregate {
 
     private short code;
 
-    private boolean errorOn;
-    private int errorRate;
     private String bankUuid;
 
     public TransactionAggregate() {
-        this.errorOn = true;
-        this.errorRate = 5;
     }
 
     @CommandHandler
@@ -53,28 +49,30 @@ public class TransactionAggregate {
         BankAccount bankAccountDst = bankAccountClient.getBankAccount(createTransactionCommand.getDest());
 
         Transaction transaction = new Transaction(createTransactionCommand.getUuid(), bankAccountSrc, bankAccountDst, createTransactionCommand.getAmount(),
-                createTransactionCommand.getCreatedTransaction(), createTransactionCommand.getTransactionState(), createTransactionCommand.getCode());
+                createTransactionCommand.getCreatedTransaction(), TransactionState.valueOf(createTransactionCommand.getTransactionState()), createTransactionCommand.getCode());
 
         if (bankAccountSrc != null && bankAccountDst != null) {
             transactionRepository.save(transaction);
-            apply(new CreateTransactionEvent(transaction.getUuid(), transaction));
+            apply(new TransactionCreatedEvent(transaction.getUuid(), transaction.getSource().getIban(), transaction.getDest().getIban(), transaction.getAmount(),
+                    transaction.getCreatedTransaction(), transaction.getTransactionState().getValue(), transaction.getCode()));
         } else {
-            apply(new TransactionRejectedEvent(transaction.getUuid(), transaction));
+            apply(new TransactionRejectedEvent(transaction.getUuid()));
         }
     }
 
     @SagaEventHandler(associationProperty = "uuid")
-    protected void on(CreateTransactionEvent createTransactionEvent) {
-        System.out.println("Dans @EventHandler on " + createTransactionEvent.toString());
-        Transaction transaction = createTransactionEvent.getTransaction();
-        this.uuid = transaction.getUuid();
-        this.sourceAccount = transaction.getSource();
-        this.destAccount = transaction.getDest();
-        this.amount = transaction.getAmount();
-        this.createdTransaction = transaction.getCreatedTransaction();
-        this.transactionState = transaction.getTransactionState();
-        this.code = transaction.getCode();
+    protected void on(TransactionCreatedEvent transactionCreatedEvent, BankAccountClient bankAccountClient) {
+        System.out.println("Dans @EventHandler on " + transactionCreatedEvent.toString());
+        BankAccount bankAccountSrc = bankAccountClient.getBankAccount(transactionCreatedEvent.getSourceAccount());
+        BankAccount bankAccountDst = bankAccountClient.getBankAccount(transactionCreatedEvent.getDestAccount());
 
+        this.uuid = transactionCreatedEvent.getUuid();
+        this.sourceAccount = bankAccountSrc;
+        this.destAccount = bankAccountDst;
+        this.amount = transactionCreatedEvent.getAmount();
+        this.createdTransaction = transactionCreatedEvent.getCreatedTransaction();
+        this.transactionState = TransactionState.valueOf(transactionCreatedEvent.getTransactionState());
+        this.code = transactionCreatedEvent.getCode();
     }
 
     @CommandHandler
@@ -84,16 +82,16 @@ public class TransactionAggregate {
         Transaction transaction = buildTransaction();
 
         if (this.sourceAccount == null || this.destAccount == null || this.sourceAccount.getBalance() < this.amount) {
-            apply(new TransactionRejectedEvent(transaction.getUuid(), transaction));
+            apply(new TransactionRejectedEvent(transaction.getUuid()));
         } else {
-            apply(new TransactionCheckedEvent(transaction.getUuid(), transaction));
+            apply(new TransactionCheckedEvent(transaction.getUuid(), transaction.getSource().getIban(),
+                    transaction.getDest().getIban(), transaction.getAmount()));
         }
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     protected void on(TransactionRejectedEvent transactionRejectedEvent) {
         System.out.println("Dans @EventHandler on " + transactionRejectedEvent.toString());
-        this.uuid = transactionRejectedEvent.getTransaction().getUuid();
         this.transactionState = TransactionState.CANCEL;
     }
 
@@ -114,20 +112,21 @@ public class TransactionAggregate {
             Random random = new Random();
             int randomNumber = random.nextInt(100) + 1;
             if (randomNumber <= errorService.getErrorRate()) {
-                apply(new TransferCancelledEvent(storeTransactionCommand.getBankUuid(), transaction));
+                apply(new TransferCancelledEvent(storeTransactionCommand.getBankUuid(), transaction.getUuid(), transaction.getSource().getIban(),
+                        transaction.getDest().getIban(), transaction.getAmount()));
                 //throw new DatabaseWriteException("Error due to our fixed rate");
             } else {
                 if (transaction.getAmount() >= 10.0) {
                     apply(new VerificationCodeNeeded(transaction.getUuid()));
                 } else {
-                    apply(new TransactionApprovedEvent(transaction.getUuid(), transaction));
+                    apply(new TransactionStoredEvent(transaction.getUuid()));
                 }
             }
         } else {
             if (transaction.getAmount() >= 10.0) {
                 apply(new VerificationCodeNeeded(transaction.getUuid()));
             } else {
-                apply(new TransactionApprovedEvent(transaction.getUuid(), transaction));
+                apply(new TransactionApprovedEvent(transaction.getUuid()));
             }
         }
     }
@@ -145,23 +144,37 @@ public class TransactionAggregate {
 
         if (this.code != confirmCodeCommand.getCode()) {
             //FIXME improve this
-            apply(new TransferCancelledEvent(this.bankUuid, transaction));
+            apply(new TransferCancelledEvent(this.bankUuid, transaction.getUuid(), transaction.getSource().getIban(),
+                    transaction.getDest().getIban(), transaction.getAmount()));
         } else {
             //FIXME à quoi ça sert ça ?
             // transaction.setCode((short) 0);
             // transactionRepository.save(transaction);
-            apply(new TransactionApprovedEvent(transaction.getUuid(), transaction));
+            apply(new TransactionStoredEvent(transaction.getUuid()));
         }
+    }
+
+    @CommandHandler
+    public void rejectTransaction(RejectTransactionCommand rejectTransactionCommand, TransactionRepository transactionRepository) {
+        System.out.println("Dans @CommandHandler RejectTransactionCommand " + rejectTransactionCommand.toString());
+
+        Transaction transaction = buildTransaction();
+        transaction.setTransactionState(TransactionState.CANCEL);
+
+        transactionRepository.save(transaction);
+    }
+
+    @CommandHandler
+    public void approveTransaction(ApproveTransactionCommand approveTransactionCommand, TransactionRepository transactionRepository) {
+        System.out.println("Dans @CommandHandler ApproveTransactionCommand " + approveTransactionCommand.toString());
+
+        Transaction transaction = buildTransaction();
+        transaction.setTransactionState(TransactionState.ACCEPTED);
+
+        transactionRepository.save(transaction);
     }
 
     private Transaction buildTransaction() {
         return new Transaction(this.uuid, this.sourceAccount, this.destAccount, this.amount, this.createdTransaction, this.transactionState, this.code);
-    }
-
-
-    @CommandHandler
-    public void rejectTransaction(RejectTransactionCommand rejectTransactionCommand) {
-        System.out.println("Dans @CommandHandler RejectTransactionCommand " + rejectTransactionCommand.toString());
-        apply(new TransactionRejectedEvent(rejectTransactionCommand.getUuid(), rejectTransactionCommand.getTransaction()));
     }
 }
