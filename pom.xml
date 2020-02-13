@@ -25,13 +25,6 @@
 
 
     <dependencies>
-        <!-- core-api dependency for commands and events -->
-        <dependency>
-            <groupId>fr.unice.polytech.si5.al.creditrama.teamd</groupId>
-            <artifactId>core-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
         <!-- Axon -->
         <dependency>
             <groupId>org.axonframework</groupId>
