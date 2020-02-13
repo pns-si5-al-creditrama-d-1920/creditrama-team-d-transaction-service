@@ -1,12 +1,14 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.aggregators;
 
-import fr.unice.polytech.si5.al.creditrama.teamd.coreapi.commands.*;
-import fr.unice.polytech.si5.al.creditrama.teamd.coreapi.events.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.client.BankAccountClient;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.*;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransferDTO;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.BankAccountService;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.ErrorService;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -35,8 +37,6 @@ public class TransactionAggregate {
     private TransactionState transactionState;
 
     private short code;
-
-    private String bankUuid;
 
     public TransactionAggregate() {
     }
@@ -89,17 +89,20 @@ public class TransactionAggregate {
         }
     }
 
-    @SagaEventHandler(associationProperty = "uuid")
-    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
-        System.out.println("Dans @EventHandler on " + transactionRejectedEvent.toString());
-        this.transactionState = TransactionState.CANCEL;
+    @CommandHandler
+    public void makeTransfer(MakeTransferCommand makeTransferCommand, BankAccountService bankAccountService) {
+        System.out.println("Dans @CommandHandler MakeTransferCommand " + makeTransferCommand.toString());
+        TransferDTO transferDTO = new TransferDTO(makeTransferCommand.getUuid(), makeTransferCommand.getSourceIban(), makeTransferCommand.getDestIban(),
+                makeTransferCommand.getAmount());
+
+        bankAccountService.makeTransfer(transferDTO);
+        apply(new AwaitingTransferEvent(makeTransferCommand.getUuid()));
     }
 
     @CommandHandler
     public void storeTransaction(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) {
         System.out.println("Dans @CommandHandler StoreTransactionCommand " + storeTransactionCommand.toString());
         Transaction transaction = buildTransaction();
-        this.bankUuid = storeTransactionCommand.getBankUuid();
 
         //save transaction
         transactionRepository.save(transaction);
@@ -112,7 +115,7 @@ public class TransactionAggregate {
             Random random = new Random();
             int randomNumber = random.nextInt(100) + 1;
             if (randomNumber <= errorService.getErrorRate()) {
-                apply(new TransferCancelledEvent(storeTransactionCommand.getBankUuid(), transaction.getUuid(), transaction.getSource().getIban(),
+                apply(new TransferCancelledEvent(transaction.getUuid(), transaction.getSource().getIban(),
                         transaction.getDest().getIban(), transaction.getAmount()));
                 //throw new DatabaseWriteException("Error due to our fixed rate");
             } else {
@@ -131,10 +134,14 @@ public class TransactionAggregate {
         }
     }
 
-    @SagaEventHandler(associationProperty = "uuid")
-    protected void on(TransactionApprovedEvent transactionApprovedEvent) {
-        System.out.println("Dans @EventHandler on " + transactionApprovedEvent.toString());
-        this.transactionState = TransactionState.ACCEPTED;
+    @CommandHandler
+    public void reverseTransfer(ReverseTransferCommand reverseTransferCommand, BankAccountService bankAccountService) {
+        System.out.println("Dans @CommandHandler ReverseTransferCommand " + reverseTransferCommand.toString());
+        TransferDTO transferDTO = new TransferDTO(reverseTransferCommand.getUuid(), reverseTransferCommand.getDestIban(),
+                reverseTransferCommand.getSourceIban(), reverseTransferCommand.getAmount());
+
+        bankAccountService.reverseTransfer(transferDTO);
+        apply(new AwaitingTransferEvent(reverseTransferCommand.getUuid()));
     }
 
     @CommandHandler
@@ -144,7 +151,7 @@ public class TransactionAggregate {
 
         if (this.code != confirmCodeCommand.getCode()) {
             //FIXME improve this
-            apply(new TransferCancelledEvent(this.bankUuid, transaction.getUuid(), transaction.getSource().getIban(),
+            apply(new TransferCancelledEvent(transaction.getUuid(), transaction.getSource().getIban(),
                     transaction.getDest().getIban(), transaction.getAmount()));
         } else {
             //FIXME à quoi ça sert ça ?
@@ -162,6 +169,13 @@ public class TransactionAggregate {
         transaction.setTransactionState(TransactionState.CANCEL);
 
         transactionRepository.save(transaction);
+        apply(new TransactionClosedEvent(transaction.getUuid()));
+    }
+
+    @SagaEventHandler(associationProperty = "uuid")
+    protected void on(TransactionRejectedEvent transactionRejectedEvent) {
+        System.out.println("Dans @EventHandler on " + transactionRejectedEvent.toString());
+        this.transactionState = TransactionState.CANCEL;
     }
 
     @CommandHandler
@@ -172,6 +186,13 @@ public class TransactionAggregate {
         transaction.setTransactionState(TransactionState.ACCEPTED);
 
         transactionRepository.save(transaction);
+        apply(new TransactionClosedEvent(transaction.getUuid()));
+    }
+
+    @SagaEventHandler(associationProperty = "uuid")
+    protected void on(TransactionApprovedEvent transactionApprovedEvent) {
+        System.out.println("Dans @EventHandler on " + transactionApprovedEvent.toString());
+        this.transactionState = TransactionState.ACCEPTED;
     }
 
     private Transaction buildTransaction() {
