@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -43,14 +44,16 @@ public class TransactionController {
 
     @GetMapping("clients/{id}/transactions")
     public ResponseEntity<List<Transaction>> getTransactionByIban(@RequestParam(value = "type", required = false) String type, @PathVariable(value = "id") long id) {
+        if (type == null) {
+            return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, null));
+        }
         if (type.equals("ACCEPTED")) {
             return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, TransactionState.ACCEPTED));
         }
         if (type.equals("PENDING")) {
             return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, TransactionState.PENDING));
-        } else {
-            return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, null));
         }
+        return ResponseEntity.notFound().build();
     }
 
 
