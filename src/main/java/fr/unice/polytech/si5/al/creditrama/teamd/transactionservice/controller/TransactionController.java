@@ -42,7 +42,7 @@ public class TransactionController {
     }
 
     @GetMapping("clients/{id}/transactions")
-    public ResponseEntity<List<Transaction>> getTransactionByIban(@RequestParam(value = "type", required = false) String type, @PathVariable(value = "id") long id) {
+    public ResponseEntity<List<Transaction>> getTransactionByIban(@RequestParam(value = "type") String type, @PathVariable(value = "id") long id) {
         if (type.equals("ACCEPTED")) {
             return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, TransactionState.ACCEPTED));
         }
