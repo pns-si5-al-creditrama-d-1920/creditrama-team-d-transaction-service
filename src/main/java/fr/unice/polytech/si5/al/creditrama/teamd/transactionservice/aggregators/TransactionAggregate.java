@@ -126,7 +126,7 @@ public class TransactionAggregate {
             if (transaction.getAmount() >= 10.0) {
                 apply(new VerificationCodeNeeded(transaction.getUuid()));
             } else {
-                apply(new TransactionApprovedEvent(transaction.getUuid()));
+                apply(new TransactionStoredEvent(transaction.getUuid()));
             }
         }
     }
