@@ -17,7 +17,6 @@ spring:
           brokers:
             - ${KAFKA_BROKER:localhost}
 
-
 security:
   oauth2:
     resource:

@@ -21,7 +21,7 @@ public class MakeTransactionSaga {
     @StartSaga
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionCreatedEvent transactionCreatedEvent) {
-        System.out.println("Saga invoked CreateTransactionEvent" + transactionCreatedEvent.toString());
+        System.out.println("Saga invoked CreateTransactionEvent " + transactionCreatedEvent.toString());
         commandGateway.send(new CheckTransactionCommand(transactionCreatedEvent.getUuid()));
     }
 
