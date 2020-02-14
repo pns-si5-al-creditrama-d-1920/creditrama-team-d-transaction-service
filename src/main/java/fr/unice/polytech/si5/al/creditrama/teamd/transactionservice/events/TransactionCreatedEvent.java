@@ -1,5 +1,6 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.BankAccount;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
@@ -7,9 +8,9 @@ import java.time.LocalDateTime;
 @ToString
 public class TransactionCreatedEvent {
     private String uuid;
-    private String sourceAccount;
+    private BankAccount sourceAccount;
 
-    private String destAccount;
+    private BankAccount destAccount;
 
     private double amount;
 
@@ -19,7 +20,7 @@ public class TransactionCreatedEvent {
 
     private short code;
 
-    public TransactionCreatedEvent(String uuid, String sourceAccount, String destAccount, double amount, LocalDateTime createdTransaction, String transactionState, short code) {
+    public TransactionCreatedEvent(String uuid, BankAccount sourceAccount, BankAccount destAccount, double amount, LocalDateTime createdTransaction, String transactionState, short code) {
         this.uuid = uuid;
         this.sourceAccount = sourceAccount;
         this.destAccount = destAccount;
@@ -33,11 +34,11 @@ public class TransactionCreatedEvent {
         return uuid;
     }
 
-    public String getSourceAccount() {
+    public BankAccount getSourceAccount() {
         return sourceAccount;
     }
 
-    public String getDestAccount() {
+    public BankAccount getDestAccount() {
         return destAccount;
     }
 

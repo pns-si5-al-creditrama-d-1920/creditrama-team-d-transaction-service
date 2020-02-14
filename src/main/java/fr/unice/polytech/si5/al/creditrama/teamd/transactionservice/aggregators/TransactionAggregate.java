@@ -53,7 +53,7 @@ public class TransactionAggregate {
 
         if (bankAccountSrc != null && bankAccountDst != null) {
             transactionRepository.save(transaction);
-            apply(new TransactionCreatedEvent(transaction.getUuid(), transaction.getSource().getIban(), transaction.getDest().getIban(), transaction.getAmount(),
+            apply(new TransactionCreatedEvent(transaction.getUuid(), bankAccountSrc, bankAccountDst, transaction.getAmount(),
                     transaction.getCreatedTransaction(), transaction.getTransactionState().getValue(), transaction.getCode()));
         } else {
             apply(new TransactionRejectedEvent(transaction.getUuid()));
@@ -63,12 +63,9 @@ public class TransactionAggregate {
     @SagaEventHandler(associationProperty = "uuid")
     protected void on(TransactionCreatedEvent transactionCreatedEvent, BankAccountClient bankAccountClient) {
         System.out.println("Dans @EventHandler on " + transactionCreatedEvent.toString());
-        BankAccount bankAccountSrc = bankAccountClient.getBankAccount(transactionCreatedEvent.getSourceAccount());
-        BankAccount bankAccountDst = bankAccountClient.getBankAccount(transactionCreatedEvent.getDestAccount());
-
         this.uuid = transactionCreatedEvent.getUuid();
-        this.sourceAccount = bankAccountSrc;
-        this.destAccount = bankAccountDst;
+        this.sourceAccount = transactionCreatedEvent.getSourceAccount();
+        this.destAccount = transactionCreatedEvent.getDestAccount();
         this.amount = transactionCreatedEvent.getAmount();
         this.createdTransaction = transactionCreatedEvent.getCreatedTransaction();
         this.transactionState = TransactionState.valueOf(transactionCreatedEvent.getTransactionState());
