@@ -35,7 +35,6 @@ axon:
         mode: subscribing
   axonserver:
     servers: ${AXON_SERVER:localhost}
-    client-id: transaction-service
     component-name: transaction-service
 
 
