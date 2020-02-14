@@ -16,4 +16,8 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     List<Transaction> findAllByDestClientAndTransactionState(long id, TransactionState transactionState);
 
     List<Transaction> findByCodeNotNullAndTransactionState(TransactionState state);
+
+    List<Transaction> findAllBySourceClient(long id);
+
+    List<Transaction> findAllByDestClient(long id);
 }

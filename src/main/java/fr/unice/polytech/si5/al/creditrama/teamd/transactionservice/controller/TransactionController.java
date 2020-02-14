@@ -3,6 +3,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.controller;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionRequest;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionResponse;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.TransactionState;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,8 +42,15 @@ public class TransactionController {
     }
 
     @GetMapping("clients/{id}/transactions")
-    public ResponseEntity<List<Transaction>> getTransactionByIban(@PathVariable(value = "id") long id) {
-        return ResponseEntity.ok(transactionService.getAcceptedTransactionByIban(id));
+    public ResponseEntity<List<Transaction>> getTransactionByIban(@RequestParam(value = "type") String type, @PathVariable(value = "id") long id) {
+        if (type.equals("ACCEPTED")) {
+            return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, TransactionState.ACCEPTED));
+        }
+        if (type.equals("PENDING")) {
+            return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, TransactionState.PENDING));
+        } else {
+            return ResponseEntity.ok(transactionService.getAllTransactionByIban(id, null));
+        }
     }
 
 
