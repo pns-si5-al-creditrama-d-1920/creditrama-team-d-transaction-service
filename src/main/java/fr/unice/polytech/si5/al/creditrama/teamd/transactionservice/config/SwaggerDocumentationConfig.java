@@ -3,6 +3,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -15,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @Configuration
 @Import(BeanValidatorPluginsConfiguration.class)
-public class SwaggerDocumentationConfig implements WebMvcConfigurer {
+public class SwaggerDocumentationConfig  {
     ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("BankService API")
@@ -26,6 +27,7 @@ public class SwaggerDocumentationConfig implements WebMvcConfigurer {
                 .version("1.0.0")
                 .build();
     }
+
 
     @Bean
     public Docket customImplementation() {
