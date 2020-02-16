@@ -1,20 +1,10 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
-import lombok.ToString;
+import lombok.Getter;
 
-@ToString
-public class AwaitingTransferEvent {
-    private String uuid;
+public class AwaitingTransferEvent extends Event {
 
     public AwaitingTransferEvent(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 }

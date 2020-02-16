@@ -1,36 +1,17 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transaction;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
+@AllArgsConstructor
 @ToString
+@Getter
 public class UpdateBankAccountCommand {
 
     @TargetAggregateIdentifier
     private String uuid;
-
     private Transaction transaction;
-
-
-    public UpdateBankAccountCommand(String uuid, Transaction transaction) {
-        this.transaction = transaction;
-        this.uuid = uuid;
-    }
-
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 }

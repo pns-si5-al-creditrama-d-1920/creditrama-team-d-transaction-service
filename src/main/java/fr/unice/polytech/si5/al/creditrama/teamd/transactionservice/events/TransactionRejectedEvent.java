@@ -1,17 +1,11 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
-public class TransactionRejectedEvent {
-    private String uuid;
+import lombok.Getter;
+
+@Getter
+public class TransactionRejectedEvent extends Event {
 
     public TransactionRejectedEvent(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 }
