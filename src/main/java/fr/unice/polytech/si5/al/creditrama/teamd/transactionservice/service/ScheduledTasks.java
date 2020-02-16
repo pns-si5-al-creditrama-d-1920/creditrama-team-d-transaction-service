@@ -27,7 +27,7 @@ public class ScheduledTasks {
     public void checkCodeForPendingTransactions() {
         List<Transaction> transactions = transactionRepository.findByCodeNotNullAndTransactionState(TransactionState.PENDING);
         transactions.stream()
-                .filter(transaction -> transaction.getCreatedTransaction().plusMinutes(2).isAfter(LocalDateTime.now()))
+                .filter(transaction -> transaction.getCreatedTransaction().plusMinutes(15).isAfter(LocalDateTime.now()))
                 .forEach(transaction -> {
 //                    transaction.setCode((short) 0);
 //                    transaction.setTransactionState(TransactionState.CANCEL);

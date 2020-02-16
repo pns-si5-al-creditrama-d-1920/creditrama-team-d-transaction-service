@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@CrossOrigin(origins = "*", allowedHeaders = "content-type")
+@CrossOrigin(origins = "*")
 @RestController
 public class TransactionController {
     private final TransactionService transactionService;
@@ -25,16 +25,13 @@ public class TransactionController {
     }
 
     @PostMapping("/transactions")
-    public TransactionResponse createTransaction(@RequestBody TransactionRequest transactionRequest) throws ExecutionException, InterruptedException {
-        //Transaction transaction = transactionService.makeTransaction(transactionRequest);
-        //TODO FIX CODE WORKAROUND
-         return transactionService.createTransaction(transactionRequest);
+    public TransactionResponse createTransaction(@RequestBody TransactionRequest transactionRequest) {
+        return transactionService.createTransaction(transactionRequest);
     }
 
     @PatchMapping("/transactions/{uuid}/code")
     public ResponseEntity<HttpStatus> confirmCode(@RequestParam(value = "code") String code, @PathVariable(value = "uuid") String uuid) {
-        transactionService.confirmCode(uuid, Short.parseShort(code));
-        return ResponseEntity.ok(HttpStatus.OK);
+        return ResponseEntity.ok(transactionService.confirmCode(uuid, Short.parseShort(code)));
     }
 
     @GetMapping("/transactions/{iban}")

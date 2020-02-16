@@ -7,6 +7,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -34,13 +35,10 @@ public class TransactionService {
     /* SAGA ADDED */
     public TransactionResponse createTransaction(TransactionRequest transactionRequest) {
         String uuid = UUID.randomUUID().toString();
-        System.out.println("transaction request " + transactionRequest.toString());
-        System.out.println("command gateway : " + commandGateway.toString());
         commandGateway.send(new CreateTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(),
                 transactionRequest.getAmount(), LocalDateTime.now(Clock.systemDefaultZone()), TransactionState.PENDING.getValue(), (short) (new Random().nextInt(9000) + 1000)));
         return new TransactionResponse(uuid, transactionRequest.getAmount() >= 10);
     }
-
 
     public List<Transaction> getAcceptedTransactionByIban(String iban) {
         List<Transaction> allByIban = transactionRepository.findAllByDestIbanAndTransactionState(iban, TransactionState.ACCEPTED);
@@ -59,19 +57,13 @@ public class TransactionService {
         return allById;
     }
 
-    public boolean oldConfirmCode(String uuid, short code) {
-        Optional<Transaction> transactionOpt = transactionRepository.findById(uuid);
-        if (!transactionOpt.isPresent() || transactionOpt.get().getCode() != code) {
-            return false;
-        }
-        Transaction transaction = transactionOpt.get();
-        transaction.setCode((short) 0);
-        transaction.setTransactionState(TransactionState.ACCEPTED);
-        transactionRepository.save(transaction);
-        return true;
-    }
-
-    public void confirmCode(String uuid, short code) {
+    public HttpStatus confirmCode(String uuid, short code) {
         commandGateway.send(new ConfirmCodeCommand(uuid, code));
+        Optional<Transaction> transaction = transactionRepository.findById(uuid);
+        if (transaction.isPresent()) {
+            return transaction.get().getCode() != code ? HttpStatus.EXPECTATION_FAILED : HttpStatus.OK;
+        } else {
+            return HttpStatus.NOT_FOUND;
+        }
     }
 }

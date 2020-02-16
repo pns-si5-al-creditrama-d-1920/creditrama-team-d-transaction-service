@@ -7,71 +7,74 @@ import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
 import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Saga;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Saga
-public class MakeTransactionSaga {
+public class TransactionManagementSaga {
+    private Logger logger = LoggerFactory.getLogger(TransactionManagementSaga.class);
 
     @Autowired
     private transient CommandGateway commandGateway;
 
-    public MakeTransactionSaga() {
+    public TransactionManagementSaga() {
     }
 
     @StartSaga
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionCreatedEvent transactionCreatedEvent) {
-        System.out.println("Saga invoked CreateTransactionEvent " + transactionCreatedEvent.toString());
+        logger.info(transactionCreatedEvent.toString());
         commandGateway.send(new CheckTransactionCommand(transactionCreatedEvent.getUuid()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionCheckedEvent transactionCheckedEvent) {
-        System.out.println("Saga invoked TransactionCheckedEvent");
-
+        logger.info(transactionCheckedEvent.toString());
         commandGateway.send(new MakeTransferCommand(transactionCheckedEvent.getUuid(),
                 transactionCheckedEvent.getSourceIban(), transactionCheckedEvent.getDestIban(), transactionCheckedEvent.getAmount()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransferCancelledEvent transferCancelledEvent) {
-        System.out.println("Saga invoked TransferCancelledEvent");
+        logger.info(transferCancelledEvent.toString());
         commandGateway.send(new ReverseTransferCommand(transferCancelledEvent.getUuid(),
                 transferCancelledEvent.getSourceIban(), transferCancelledEvent.getDestIban(), transferCancelledEvent.getAmount()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(AwaitingTransferEvent awaitingTransferEvent) {
-        System.out.println("Saga invoked AwaitingTransferEvent" + awaitingTransferEvent.toString());
+        logger.info(awaitingTransferEvent.toString());
         System.out.println("Waiting for transfer to be processed...");
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(VerificationCodeNeeded verificationCodeNeeded) {
-        System.out.println("Saga invoked VerificationCodeNeeded" + verificationCodeNeeded.toString());
+        logger.info(verificationCodeNeeded.toString());
         System.out.println("Waiting for verification code...");
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionStoredEvent transactionStoredEvent) {
-        System.out.println("Saga invoked TransactionStoredEvent");
+        logger.info(transactionStoredEvent.toString());
         commandGateway.send(new ApproveTransactionCommand(transactionStoredEvent.getUuid()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionRejectedEvent transactionRejectedEvent) {
+        logger.info(transactionRejectedEvent.toString());
         commandGateway.send(new RejectTransactionCommand(transactionRejectedEvent.getUuid()));
-        System.out.println("Transaction has been successfully rejected.");
     }
 
     @SagaEventHandler(associationProperty = "uuid")
+    @EndSaga
     public void handle(TransactionApprovedEvent transactionApprovedEvent) {
-        System.out.println("Transaction has been successfully approved.");
+        logger.info(transactionApprovedEvent.toString());
     }
 
     @SagaEventHandler(associationProperty = "uuid")
     @EndSaga
     public void handle(TransactionClosedEvent transactionClosedEvent) {
-        System.out.println("Transaction is now finished.");
+        logger.info("[ Transaction : " + transactionClosedEvent.getUuid() + " ] is done.");
     }
 }

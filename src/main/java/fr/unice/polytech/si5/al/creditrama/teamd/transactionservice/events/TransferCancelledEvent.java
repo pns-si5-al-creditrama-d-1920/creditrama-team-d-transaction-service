@@ -1,7 +1,9 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events;
 
-public class TransferCancelledEvent {
-    private String uuid;
+import lombok.Getter;
+
+@Getter
+public class TransferCancelledEvent extends Event {
     private String sourceIban;
     private String destIban;
     private double amount;
@@ -11,37 +13,5 @@ public class TransferCancelledEvent {
         this.sourceIban = sourceIban;
         this.destIban = destIban;
         this.amount = amount;
-    }
-
-    public String getSourceIban() {
-        return sourceIban;
-    }
-
-    public void setSourceIban(String sourceIban) {
-        this.sourceIban = sourceIban;
-    }
-
-    public String getDestIban() {
-        return destIban;
-    }
-
-    public void setDestIban(String destIban) {
-        this.destIban = destIban;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 }

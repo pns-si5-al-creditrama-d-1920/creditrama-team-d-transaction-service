@@ -1,21 +1,15 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
+@AllArgsConstructor
+@ToString
+@Getter
 public class ApproveTransactionCommand {
 
     @TargetAggregateIdentifier
     private String uuid;
-
-    public ApproveTransactionCommand(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 }
