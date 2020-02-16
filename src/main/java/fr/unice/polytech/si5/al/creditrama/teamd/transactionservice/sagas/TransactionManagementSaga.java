@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Saga
-public class MakeTransactionSaga {
-    private Logger logger = LoggerFactory.getLogger(MakeTransactionSaga.class);
+public class TransactionManagementSaga {
+    private Logger logger = LoggerFactory.getLogger(TransactionManagementSaga.class);
 
     @Autowired
     private transient CommandGateway commandGateway;
 
-    public MakeTransactionSaga() {
+    public TransactionManagementSaga() {
     }
 
     @StartSaga
@@ -67,6 +67,7 @@ public class MakeTransactionSaga {
     }
 
     @SagaEventHandler(associationProperty = "uuid")
+    @EndSaga
     public void handle(TransactionApprovedEvent transactionApprovedEvent) {
         logger.info(transactionApprovedEvent.toString());
     }
