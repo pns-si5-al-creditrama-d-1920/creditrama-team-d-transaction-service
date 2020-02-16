@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@CrossOrigin(origins = "*", allowedHeaders = "content-type")
+@CrossOrigin(origins = "*")
 @RestController
 public class TransactionController {
     private final TransactionService transactionService;
