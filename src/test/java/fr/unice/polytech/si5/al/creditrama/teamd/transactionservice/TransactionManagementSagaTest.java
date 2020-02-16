@@ -7,6 +7,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.Transa
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.sagas.TransactionManagementSaga;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(initializers = PropertyOverrideContextInitializer.class)
 @Profile("!disable-kafka")
+@Disabled
 public class TransactionManagementSagaTest {
 
     private static SagaTestFixture<TransactionManagementSaga> fixture = new SagaTestFixture<>(TransactionManagementSaga.class);
