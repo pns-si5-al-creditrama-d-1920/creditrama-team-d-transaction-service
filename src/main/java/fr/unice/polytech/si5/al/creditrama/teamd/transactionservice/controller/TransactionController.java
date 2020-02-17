@@ -10,12 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static java.util.stream.Collectors.toList;
 
@@ -47,16 +43,11 @@ public class TransactionController {
     @GetMapping("clients/{id}/transactions")
     public ResponseEntity<List<Transaction>> getTransactionByIban(@RequestParam(value = "type", required = false) TransactionState type, @PathVariable(value = "id") long id) {
         List<Transaction> allTransactionByIban = transactionService.getAllTransactionByIban(id, type).stream().map(v -> {
-            v.setCode((short)0);
+            v.setCode((short) 0);
             return v;
         }).collect(toList());
-        allTransactionByIban.sort(Comparator.comparing(Transaction::getCreatedTransaction).reversed());
-        if(allTransactionByIban.isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
-        else{
-            return ResponseEntity.ok(allTransactionByIban);
-        }
+        allTransactionByIban.sort(Comparator.comparing(Transaction::getCreatedTransaction));
+        return ResponseEntity.ok(allTransactionByIban);
     }
 
 
