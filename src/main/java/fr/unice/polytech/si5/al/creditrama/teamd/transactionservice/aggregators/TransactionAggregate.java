@@ -7,6 +7,7 @@ import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.repository.TransactionRepository;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.BankAccountService;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.ErrorService;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.NotificationService;
 import lombok.NoArgsConstructor;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -76,7 +77,7 @@ public class TransactionAggregate {
     }
 
     @CommandHandler
-    public void storeTransaction(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) {
+    public void storeTransaction(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository, NotificationService notificationService) {
         Transaction transaction = buildTransaction();
 
         //Save transaction
@@ -95,6 +96,7 @@ public class TransactionAggregate {
                         transaction.getDest().getIban(), transaction.getAmount()));
             } else {
                 if (transaction.getAmount() >= 10.0) {
+                    notificationService.sendMail(transaction);
                     apply(new VerificationCodeNeeded(transaction.getUuid()));
                 } else {
                     apply(new TransactionStoredEvent(transaction.getUuid()));
@@ -102,6 +104,7 @@ public class TransactionAggregate {
             }
         } else {
             if (transaction.getAmount() >= 10.0) {
+                notificationService.sendMail(transaction);
                 apply(new VerificationCodeNeeded(transaction.getUuid()));
             } else {
                 apply(new TransactionStoredEvent(transaction.getUuid()));
@@ -144,6 +147,7 @@ public class TransactionAggregate {
         transaction.setTransactionState(TransactionState.ACCEPTED);
 
         transactionRepository.save(transaction);
+
         apply(new TransactionClosedEvent(transaction.getUuid()));
     }
 

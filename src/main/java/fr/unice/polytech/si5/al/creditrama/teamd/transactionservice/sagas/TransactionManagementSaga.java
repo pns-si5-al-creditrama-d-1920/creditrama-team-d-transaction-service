@@ -2,6 +2,7 @@ package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.sagas;
 
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.events.*;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.*;
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service.NotificationService;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
@@ -14,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Saga
 public class TransactionManagementSaga {
     private Logger logger = LoggerFactory.getLogger(TransactionManagementSaga.class);
-
     @Autowired
     private transient CommandGateway commandGateway;
 

@@ -25,7 +25,7 @@ public class ScheduledTasks {
 
     @Scheduled(fixedDelay = 120000)
     public void checkCodeForPendingTransactions() {
-        List<Transaction> transactions = transactionRepository.findByCodeNotNullAndTransactionState(TransactionState.PENDING);
+        List<Transaction> transactions = transactionRepository.findByCodeNotNullAndTransactionStateOrderByCreatedTransactionDesc(TransactionState.PENDING);
         transactions.stream()
                 .filter(transaction -> transaction.getCreatedTransaction().plusMinutes(15).isAfter(LocalDateTime.now()))
                 .forEach(transaction -> {

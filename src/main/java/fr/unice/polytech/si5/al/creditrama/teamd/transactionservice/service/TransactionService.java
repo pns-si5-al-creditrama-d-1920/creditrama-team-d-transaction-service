@@ -41,19 +41,19 @@ public class TransactionService {
     }
 
     public List<Transaction> getAcceptedTransactionByIban(String iban) {
-        List<Transaction> allByIban = transactionRepository.findAllByDestIbanAndTransactionState(iban, TransactionState.ACCEPTED);
-        allByIban.addAll(transactionRepository.findAllBySourceIbanAndTransactionState(iban, TransactionState.ACCEPTED));
+        List<Transaction> allByIban = transactionRepository.findAllByDestIbanAndTransactionStateOrderByCreatedTransactionDesc(iban, TransactionState.ACCEPTED);
+        allByIban.addAll(transactionRepository.findAllBySourceIbanAndTransactionStateOrderByCreatedTransactionDesc(iban, TransactionState.ACCEPTED));
         return allByIban;
     }
 
     public List<Transaction> getAllTransactionByIban(long id, TransactionState type) {
         if (type != null) {
-            List<Transaction> allById = transactionRepository.findAllByDestClientAndTransactionState(id, type);
-            allById.addAll(transactionRepository.findAllBySourceClientAndTransactionState(id, type));
+            List<Transaction> allById = transactionRepository.findAllByDestClientAndTransactionStateOrderByCreatedTransactionDesc(id, type);
+            allById.addAll(transactionRepository.findAllBySourceClientAndTransactionStateOrderByCreatedTransactionDesc(id, type));
             return allById;
         }
-        List<Transaction> allById = transactionRepository.findAllByDestClient(id);
-        allById.addAll(transactionRepository.findAllBySourceClient(id));
+        List<Transaction> allById = transactionRepository.findAllByDestClientOrderByCreatedTransactionDesc(id);
+        allById.addAll(transactionRepository.findAllBySourceClientOrderByCreatedTransactionDesc(id));
         return allById;
     }
 
