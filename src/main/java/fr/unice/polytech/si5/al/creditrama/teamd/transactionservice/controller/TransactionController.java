@@ -47,8 +47,7 @@ public class TransactionController {
             v.setCode((short) 0);
             return v;
         }).collect(toList());
-        allTransactionByIban.sort(Comparator.comparing(Transaction::getCreatedTransaction));
-        allTransactionByIban.sort(Collections.reverseOrder());
+        allTransactionByIban.sort(Comparator.comparing(Transaction::getCreatedTransaction).reversed());
         return ResponseEntity.ok(allTransactionByIban);
     }
 
