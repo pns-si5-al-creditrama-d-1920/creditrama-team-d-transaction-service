@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class TransactionController {
             return v;
         }).collect(toList());
         allTransactionByIban.sort(Comparator.comparing(Transaction::getCreatedTransaction));
+        allTransactionByIban.sort(Collections.reverseOrder());
         return ResponseEntity.ok(allTransactionByIban);
     }
 
