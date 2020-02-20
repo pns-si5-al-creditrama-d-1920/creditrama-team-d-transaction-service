@@ -23,7 +23,7 @@ public class ScheduledTasks {
         this.commandGateway = commandGateway;
     }
 
-    @Scheduled(fixedDelay = 120000)
+   /** @Scheduled(fixedDelay = 120000)
     public void checkCodeForPendingTransactions() {
         List<Transaction> transactions = transactionRepository.findByCodeNotNullAndTransactionStateOrderByCreatedTransactionDesc(TransactionState.PENDING);
         transactions.stream()
@@ -35,5 +35,5 @@ public class ScheduledTasks {
                     commandGateway.send(new ReverseTransferCommand(transaction.getUuid(), transaction.getSource().getIban(), transaction.getDest().getIban(), transaction.getAmount()));
 //                    transactionRepository.save(transaction);
                 });
-    }
+    }**/
 }
