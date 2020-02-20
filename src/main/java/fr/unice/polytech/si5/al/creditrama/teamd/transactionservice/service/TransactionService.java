@@ -10,7 +10,6 @@ import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +35,7 @@ public class TransactionService {
     public TransactionResponse createTransaction(TransactionRequest transactionRequest) {
         String uuid = UUID.randomUUID().toString();
         commandGateway.send(new CreateTransactionCommand(uuid, transactionRequest.getIbanSource(), transactionRequest.getIbanDest(),
-                transactionRequest.getAmount(), LocalDateTime.now(Clock.systemDefaultZone()), TransactionState.PENDING.getValue(), (short) (new Random().nextInt(9000) + 1000)));
+                transactionRequest.getAmount(), LocalDateTime.now(), TransactionState.PENDING.getValue(), (short) (new Random().nextInt(9000) + 1000)));
         return new TransactionResponse(uuid, transactionRequest.getAmount() >= 10);
     }
 

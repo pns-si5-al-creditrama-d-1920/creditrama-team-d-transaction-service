@@ -68,6 +68,19 @@ public class TransactionAggregate {
     }
 
     @CommandHandler
+    public void checkAmount(CheckTransactionAmountCommand checkTransactionAmountCommand, NotificationService notificationService) {
+        Transaction transaction = buildTransaction();
+
+        if (transaction.getAmount() >= 10) {
+            notificationService.sendMail(transaction);
+            apply(new VerificationCodeNeeded(transaction.getUuid()));
+        } else {
+            apply(new TransactionAmountCheckedEvent(transaction.getUuid(), transaction.getSource().getIban(),
+                    transaction.getDest().getIban(), transaction.getAmount()));
+        }
+    }
+
+    @CommandHandler
     public void makeTransfer(MakeTransferCommand makeTransferCommand, BankAccountService bankAccountService) {
         TransferDTO transferDTO = new TransferDTO(makeTransferCommand.getUuid(), makeTransferCommand.getSourceIban(), makeTransferCommand.getDestIban(),
                 makeTransferCommand.getAmount());
@@ -77,7 +90,7 @@ public class TransactionAggregate {
     }
 
     @CommandHandler
-    public void storeTransaction(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository, NotificationService notificationService) {
+    public void storeTransaction(StoreTransactionCommand storeTransactionCommand, TransactionRepository transactionRepository) {
         Transaction transaction = buildTransaction();
 
         //Save transaction
@@ -95,20 +108,10 @@ public class TransactionAggregate {
                 apply(new TransferCancelledEvent(transaction.getUuid(), transaction.getSource().getIban(),
                         transaction.getDest().getIban(), transaction.getAmount()));
             } else {
-                if (transaction.getAmount() >= 10.0) {
-                    notificationService.sendMail(transaction);
-                    apply(new VerificationCodeNeeded(transaction.getUuid()));
-                } else {
-                    apply(new TransactionStoredEvent(transaction.getUuid()));
-                }
-            }
-        } else {
-            if (transaction.getAmount() >= 10.0) {
-                notificationService.sendMail(transaction);
-                apply(new VerificationCodeNeeded(transaction.getUuid()));
-            } else {
                 apply(new TransactionStoredEvent(transaction.getUuid()));
             }
+        } else {
+            apply(new TransactionStoredEvent(transaction.getUuid()));
         }
     }
 
@@ -128,7 +131,7 @@ public class TransactionAggregate {
         if (this.code != confirmCodeCommand.getCode()) {
             apply(new VerificationCodeNeeded(transaction.getUuid()));
         } else {
-            apply(new TransactionStoredEvent(transaction.getUuid()));
+            apply(new CodeConfirmedEvent(transaction.getUuid(), transaction));
         }
     }
 
@@ -166,6 +169,7 @@ public class TransactionAggregate {
 
     @SagaEventHandler(associationProperty = "uuid")
     protected void on(TransactionRejectedEvent transactionRejectedEvent) {
+        this.uuid = transactionRejectedEvent.getUuid();
         this.transactionState = TransactionState.CANCEL;
     }
 

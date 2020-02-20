@@ -31,8 +31,7 @@ public class TransactionManagementSaga {
     @SagaEventHandler(associationProperty = "uuid")
     public void handle(TransactionCheckedEvent transactionCheckedEvent) {
         logger.info(transactionCheckedEvent.toString());
-        commandGateway.send(new MakeTransferCommand(transactionCheckedEvent.getUuid(),
-                transactionCheckedEvent.getSourceIban(), transactionCheckedEvent.getDestIban(), transactionCheckedEvent.getAmount()));
+        commandGateway.send(new CheckTransactionAmountCommand(transactionCheckedEvent.getUuid()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -40,6 +39,13 @@ public class TransactionManagementSaga {
         logger.info(transferCancelledEvent.toString());
         commandGateway.send(new ReverseTransferCommand(transferCancelledEvent.getUuid(),
                 transferCancelledEvent.getSourceIban(), transferCancelledEvent.getDestIban(), transferCancelledEvent.getAmount()));
+    }
+
+    @SagaEventHandler(associationProperty = "uuid")
+    public void handle(TransactionAmountCheckedEvent transactionAmountCheckedEvent) {
+        logger.info(transactionAmountCheckedEvent.toString());
+        commandGateway.send(new MakeTransferCommand(transactionAmountCheckedEvent.getUuid(), transactionAmountCheckedEvent.getSourceIban(),
+                transactionAmountCheckedEvent.getDestIban(), transactionAmountCheckedEvent.getAmount()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")
@@ -52,6 +58,13 @@ public class TransactionManagementSaga {
     public void handle(VerificationCodeNeeded verificationCodeNeeded) {
         logger.info(verificationCodeNeeded.toString());
         System.out.println("Waiting for verification code...");
+    }
+
+    @SagaEventHandler(associationProperty = "uuid")
+    public void handle(CodeConfirmedEvent codeConfirmedEvent) {
+        logger.info(codeConfirmedEvent.toString());
+        commandGateway.send(new MakeTransferCommand(codeConfirmedEvent.getUuid(), codeConfirmedEvent.getTransaction().getSource().getIban(),
+                codeConfirmedEvent.getTransaction().getDest().getIban(), codeConfirmedEvent.getTransaction().getAmount()));
     }
 
     @SagaEventHandler(associationProperty = "uuid")

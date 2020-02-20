@@ -1,5 +1,6 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.service;
 
+import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.CheckTransactionAmountCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.RejectTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.commands.StoreTransactionCommand;
 import fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.kafka.TransactionStreams;

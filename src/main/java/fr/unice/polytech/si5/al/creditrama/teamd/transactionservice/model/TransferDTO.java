@@ -1,5 +1,8 @@
 package fr.unice.polytech.si5.al.creditrama.teamd.transactionservice.model;
 
+import lombok.ToString;
+
+@ToString
 public class TransferDTO {
     private String uuid;
     private String sourceIban;

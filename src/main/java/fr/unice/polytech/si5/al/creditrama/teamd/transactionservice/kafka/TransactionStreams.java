@@ -8,7 +8,7 @@ public interface TransactionStreams {
     String TRANSFER_DONE_TOPIC = "CreditRama.Transaction.BankAccount.TransferDone";
     String TRANSFER_ERROR_TOPIC = "CreditRama.Transaction.BankAccount.TransferRejected";
 
-    @Output("CreditRama.SendNotif.Email.Transaction")
+    @Output("CreditRama.SendEmail.Transaction")
     MessageChannel sendTransaction();
 
     @Output("CreditRama.Transaction.BankAccount.MakeTransfer")

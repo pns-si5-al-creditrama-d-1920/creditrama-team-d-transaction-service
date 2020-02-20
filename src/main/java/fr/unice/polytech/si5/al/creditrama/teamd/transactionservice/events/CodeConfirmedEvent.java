@@ -6,11 +6,9 @@ import lombok.Getter;
 @Getter
 public class CodeConfirmedEvent extends Event {
     private Transaction transaction;
-    private short code;
 
-    public CodeConfirmedEvent(String uuid, Transaction transaction, short code) {
+    public CodeConfirmedEvent(String uuid, Transaction transaction) {
         this.uuid = uuid;
         this.transaction = transaction;
-        this.code = code;
     }
 }
